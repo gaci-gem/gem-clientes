@@ -1,0 +1,18 @@
+<div class="card">
+    <p-fileUpload
+        name="archivos"
+        [url]="url"
+        [multiple]="true"
+        mode="advanced"
+        (onUpload)="onUpload($event)"
+        (onBeforeUpload)="onBeforeSend($event)"
+
+        chooseLabel="Seleccionar"
+        uploadLabel="Subir"
+        cancelLabel="Cancelar"
+    >
+        <ng-template pTemplate="empty">
+            <div>Arrastrar y soltar archivos aquí para subir.</div>
+        </ng-template>
+    </p-fileUpload>
+</div>

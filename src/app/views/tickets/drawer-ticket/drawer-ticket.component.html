@@ -1,0 +1,46 @@
+<p-drawer [(visible)]="visible" position="right" [modal]="true" [closable]="false"
+  [style]="{ width: 'min(42rem, 92vw)' }" styleClass="ticket-drawer" ariaLabel="Detalle del ticket"
+  (onHide)="close()">
+  <ng-template #headless>
+    <div class="d-flex flex-column h-100">
+      <header class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom">
+        <h2 class="h5 mb-0">Detalle del ticket</h2>
+        <button pButton type="button" icon="pi pi-times" class="p-button-text p-button-rounded"
+          aria-label="Cerrar detalle del ticket" (click)="close()"></button>
+      </header>
+      <div class="ticket-drawer-content flex-grow-1 overflow-auto p-3">
+        @if (loading) {
+          <div class="state-panel" role="status" aria-live="polite"><span class="spinner-border text-primary" aria-hidden="true"></span><p>Cargando detalle...</p></div>
+        } @else if (error) {
+          <div class="state-panel" role="alert"><p>{{ error }}</p></div>
+        } @else if (ticket) {
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+            <div><p class="text-muted mb-1">#{{ ticket.id }}</p><h3 class="h4 mb-0">{{ ticket.subject }}</h3></div>
+            <p-tag [value]="ticket.status" [severity]="statusSeverity(ticket.status)" />
+          </div>
+          <section class="mb-4"><h4 class="h6">Descripción</h4><p class="white-space-pre-wrap">{{ ticket.description }}</p></section>
+           <dl class="row small mb-4"><dt class="col-5">Creado</dt><dd class="col-7">{{ ticket.createdAt | date: 'dd/MM/yyyy HH:mm' }}</dd><dt class="col-5">Actualizado</dt><dd class="col-7">{{ ticket.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</dd></dl>
+           <section class="mb-4"><h4 class="h6">Referencia externa</h4>
+             <div class="input-group"><input class="form-control" maxlength="255" [(ngModel)]="externalReferenceDraft" aria-label="Referencia externa" placeholder="Sin referencia" />
+               <button class="btn btn-outline-primary" type="button" [disabled]="externalReferenceLoading" (click)="updateExternalReference()">{{ externalReferenceLoading ? 'Guardando...' : 'Guardar' }}</button></div>
+             @if (externalReferenceError) { <small class="text-danger d-block mt-1" role="alert">{{ externalReferenceError }}</small> }
+           </section>
+          <section class="mb-4"><h4 class="h6">Comentarios</h4>
+             @if (ticket.comments.length) { @for (comment of ticket.comments; track comment.id) { <article class="border rounded p-2 mb-2"><p class="mb-1 white-space-pre-wrap">{{ comment.text }}</p>@for (file of comment.attachments; track file.id) { <a class="d-block small" [href]="apiBaseUrl + file.downloadUrl" target="_blank" rel="noopener">{{ file.name }}</a> }<small class="text-muted">{{ comment.createdAt | date: 'dd/MM/yyyy HH:mm' }}</small></article> } } @else { <p class="text-muted">Todavía no hay comentarios.</p> }
+             <label class="form-label mt-2" for="ticket-comment">Agregar comentario</label><textarea id="ticket-comment" class="form-control" rows="3" maxlength="5000" [(ngModel)]="commentDraft"></textarea>
+              <input #commentFileInput class="form-control mt-2" type="file" multiple (change)="onCommentFiles($event)" aria-label="Adjuntos del comentario" />
+              @if (commentFiles.length) { <small class="text-muted d-block mt-1">Archivos seleccionados: {{ commentFiles.length }}</small><ul class="small mb-0">@for (file of commentFiles; track file.name + file.size) { <li>{{ file.name }}</li> }</ul> }
+            @if (commentError) { <small class="text-danger d-block mt-1" role="alert">{{ commentError }}</small> }
+             <button class="btn btn-primary btn-sm mt-2" type="button" [disabled]="commentLoading || !commentDraft.trim()" (click)="addComment()">{{ commentLoading ? 'Enviando...' : 'Enviar comentario' }}</button>
+            </section>
+             <section class="mb-4"><h4 class="h6">Adjuntos del ticket</h4>
+               @for (file of ticket.attachments; track file.id) { <a class="d-block" [href]="apiBaseUrl + file.downloadUrl" target="_blank" rel="noopener">{{ file.name }}</a> } @empty { <p class="text-muted">Sin adjuntos.</p> }
+             </section>
+          <section><h4 class="h6">Eventos asociados</h4>
+            @if (ticket.events.length) { @for (event of ticket.events; track event.code + event.type) { <article class="ticket-event border rounded p-2 mb-2"><strong>{{ event.title }}</strong><p class="mb-0 small">{{ event.type }} · {{ event.code }} · {{ event.visibleState }}</p></article> } } @else { <p class="text-muted">Este ticket no tiene eventos asociados.</p> }
+          </section>
+        }
+      </div>
+    </div>
+  </ng-template>
+</p-drawer>

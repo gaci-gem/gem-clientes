@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 58" role="img" aria-labelledby="title">
+  <title id="title">GEM</title>
+  <defs>
+    <linearGradient id="gem-green" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#62e17d" />
+      <stop offset="1" stop-color="#39bf99" />
+    </linearGradient>
+  </defs>
+  <circle cx="29" cy="29" r="25" fill="none" stroke="url(#gem-green)" stroke-width="7" />
+  <path d="M29 15v17m0 0 12-12M29 32l-11 11" fill="none" stroke="#cecece" stroke-linecap="round" stroke-width="6" />
+  <path d="M9 35c5 12 17 19 30 17 11-2 19-8 24-18" fill="none" stroke="#2ba0bf" stroke-linecap="round" stroke-width="6" />
+  <text x="69" y="40" fill="#144373" font-family="Montserrat, Arial, sans-serif" font-size="38" font-weight="700" letter-spacing="2">GEM</text>
+</svg>

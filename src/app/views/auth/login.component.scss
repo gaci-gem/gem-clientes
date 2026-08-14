@@ -1,0 +1,118 @@
+.login-page {
+  display: grid;
+  grid-template-columns: minmax(320px, .9fr) 1.1fr;
+  min-height: 100vh;
+}
+
+.login-brand-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(3rem, 8vw, 8rem);
+}
+
+.brand-mark {
+  display: grid;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 3rem;
+  place-items: center;
+  border: 2px solid currentColor;
+  border-radius: var(--bs-border-radius-lg);
+  color: var(--bs-secondary);
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.eyebrow {
+  margin: 0 0 1rem;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .14em;
+}
+
+h1 {
+  max-width: 580px;
+  margin: 0;
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -.04em;
+}
+
+.brand-copy {
+  max-width: 430px;
+  margin: 2rem 0 0;
+  color: color-mix(in srgb, currentColor 72%, transparent);
+  line-height: 1.7;
+}
+
+.login-form-panel {
+  display: grid;
+  padding: 2rem;
+  place-items: center;
+}
+
+.login-card {
+  width: min(100%, 420px);
+}
+
+.login-card .card-body {
+  padding: clamp(1rem, 4vw, 3rem);
+}
+
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-bottom: 4rem;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: .08em;
+}
+
+.brand-dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+}
+
+h2 {
+  margin: 0;
+  font-size: 2.5rem;
+  letter-spacing: -.04em;
+}
+
+form {
+  margin-top: 2.5rem;
+}
+
+.field-error {
+  display: block;
+  margin-top: .4rem;
+  font-size: .78rem;
+}
+
+.help-link {
+  display: inline-block;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 767.98px) {
+  .login-page {
+    display: block;
+  }
+
+  .login-brand-panel {
+    min-height: 38vh;
+    padding: 3rem 2rem;
+  }
+
+  .login-brand-panel h1 {
+    font-size: clamp(2rem, 10vw, 3rem);
+  }
+
+  .login-form-panel {
+    min-height: 62vh;
+    padding: 1rem;
+  }
+}

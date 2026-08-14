@@ -1,0 +1,20 @@
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-7 mt-3">
+      <div class="card">
+        <div class="card-body">
+          <h1 class="h4">Cambiar contraseña</h1>
+          <p class="text-muted">Usá tu contraseña actual para definir una nueva.</p>
+          @if (successMessage) { <p class="alert alert-success" role="status">{{ successMessage }}</p> }
+          @if (errorMessage) { <p class="alert alert-danger" role="alert">{{ errorMessage }}</p> }
+          <form [formGroup]="passwordForm" (ngSubmit)="submit()">
+            <div class="mb-3"><label class="form-label" for="currentPassword">Contraseña actual</label><input id="currentPassword" class="form-control" type="password" formControlName="currentPassword" autocomplete="current-password"></div>
+            <div class="mb-3"><label class="form-label" for="newPassword">Nueva contraseña</label><input id="newPassword" class="form-control" type="password" formControlName="newPassword" autocomplete="new-password"><small class="text-muted">Mínimo 8 caracteres.</small></div>
+            <div class="mb-3"><label class="form-label" for="confirmation">Confirmar nueva contraseña</label><input id="confirmation" class="form-control" type="password" formControlName="confirmation" autocomplete="new-password"></div>
+            <button class="btn btn-primary" type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Actualizando...' : 'Actualizar contraseña' }}</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

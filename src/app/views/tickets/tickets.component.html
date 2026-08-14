@@ -1,0 +1,131 @@
+<div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-12 mt-3">
+       <app-ui-card title="Tickets">
+         <div card-actions>
+           <button class="btn btn-primary" type="button" (click)="openCreateDialog()">
+             <i class="pi pi-plus me-1" aria-hidden="true"></i> Nuevo ticket
+           </button>
+         </div>
+           <div card-body>
+
+          @if (loading()) {
+          <div class="state-panel" role="status" aria-live="polite">
+            <span class="spinner-border text-primary" aria-hidden="true"></span>
+            <p>Cargando tus tickets...</p>
+          </div>
+          } @else if (error(); as errorMessage) {
+          <div class="state-panel" role="alert">
+            <h2>No se pudieron cargar los tickets</h2>
+            <p>{{ errorMessage }}</p>
+            <button class="btn btn-primary" type="button" (click)="loadTickets()">Intentar nuevamente</button>
+          </div>
+          } @else {
+          <p-table
+            #dt
+            [value]="tickets()"
+            [loading]="loading()"
+            [paginator]="true"
+            [rows]="10" [rowsPerPageOptions]="[5, 10, 20]"
+            [showCurrentPageReport]="true"
+            [globalFilterFields]="['id', 'subject', 'description', 'externalReference', 'status']"
+            currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} tickets"
+            [scrollable]="true"
+            stripedRows
+            size="small"
+            dataKey="id"
+            styleClass="tickets-table" [tableStyle]="{ 'min-width': '900px' }"
+            ariaLabel="Listado de tickets del Portal Cliente">
+            <ng-template pTemplate="caption">
+                <div class="flex align-items-center justify-content-between" style="display: flex;">
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText style="padding-top: 0.4rem !important;padding-bottom: 0.4rem !important;margin-left: 10px;" class="p-component p-element p-inputtext"  type="text" (input)="dt.filterGlobal(getEventValue($event), 'contains')" placeholder="Buscar..." />
+                    </span>
+                    <button class="btn btn-ghost-gray" placement="top" ngbTooltip="Limpiar Filtros" (click)="clear(dt)"><ng-icon name="tablerFilterOff"/></button>
+                </div>
+            </ng-template>
+            <ng-template #header>
+              <tr>
+                 <th scope="col" class="ticket-action-column"><span class="visually-hidden">Ver detalle</span></th>
+                <th pSortableColumn="id" scope="col" class="ticket-id-column">ID <p-sortIcon field="id" /></th>
+                <th pSortableColumn="subject" scope="col" class="ticket-request-column">Solicitud <p-sortIcon
+                    field="subject" /></th>
+                <th pSortableColumn="status" scope="col">Estado <p-sortIcon field="status" /></th>
+                <th scope="col">Referencia externa</th>
+                <th pSortableColumn="createdAt" scope="col">Creado <p-sortIcon field="createdAt" /></th>
+                <th pSortableColumn="updatedAt" scope="col">Actualizado <p-sortIcon field="updatedAt" /></th>
+              </tr>
+            </ng-template>
+             <ng-template #body let-ticket>
+               <tr>
+                 <td class="ticket-action-column">
+                   <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="secondary"
+                     [ariaLabel]="'Ver detalle del ticket #' + ticket.id" (click)="openTicket(ticket)" />
+                </td>
+                <td class="ticket-id-column">#{{ ticket.id }}</td>
+                <!-- <td scope="row" class="ticket-request-column">
+                  <div class="ticket-subject">{{ ticket.subject }}</div>
+                  <p class="ticket-description">{{ descriptionExcerpt(ticket.description) }}</p>
+                </td> -->
+                <td scope="row" class="ticket-request-column">
+                  {{ ticket.subject }}
+                </td>
+                <td><p-tag [value]="ticket.status" [severity]="statusSeverity(ticket.status)" style="font-size: 12px !important;"/></td>
+                <td>{{ ticket.externalReference || 'Sin referencia' }}</td>
+                <td class="ticket-date">{{ ticket.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                <td class="ticket-date">{{ ticket.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+              </tr>
+            </ng-template>
+            <ng-template #emptymessage>
+              <tr>
+                 <td colspan="7">
+                  <div class="empty-table-message" role="status">
+                    <h2>Aún no tenés tickets</h2>
+                    <p>Cuando registres una solicitud, vas a poder consultar acá su estado y seguimiento.</p>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+          }
+           </div>
+      </app-ui-card>
+    </div>
+  </div>
+</div>
+
+<p-dialog header="Nuevo ticket" [modal]="true" [visible]="createDialogVisible()"
+  (visibleChange)="createDialogVisible.set($event)" [style]="{ width: 'min(36rem, calc(100vw - 2rem))' }">
+  <div class="mb-3">
+    <label class="form-label" for="ticket-subject">Asunto</label>
+    <input pInputText id="ticket-subject" class="w-100" maxlength="200" [ngModel]="newSubject()"
+      (ngModelChange)="newSubject.set($event)" />
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="ticket-files">Adjuntos <span class="text-muted">(opcional)</span></label>
+    <input id="ticket-files" class="form-control" type="file" multiple (change)="onNewFiles($event)" />
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="ticket-description">Descripción</label>
+    <textarea id="ticket-description" class="form-control w-100" rows="6" [ngModel]="newDescription()"
+      (ngModelChange)="newDescription.set($event)"></textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="ticket-external-reference">Referencia externa <span class="text-muted">(opcional)</span></label>
+    <input pInputText id="ticket-external-reference" class="w-100" maxlength="255" [ngModel]="newExternalReference()"
+      (ngModelChange)="newExternalReference.set($event)" />
+  </div>
+  @if (createError(); as createErrorMessage) {
+  <p class="text-danger" role="alert">{{ createErrorMessage }}</p>
+  }
+  <ng-template #footer>
+    <button class="btn btn-light" type="button" (click)="createDialogVisible.set(false)">Cancelar</button>
+    <button class="btn btn-primary" type="button" [disabled]="createLoading()" (click)="createTicket()">
+      {{ createLoading() ? 'Creando...' : 'Crear ticket' }}
+    </button>
+  </ng-template>
+</p-dialog>
+
+<app-drawer-ticket [visible]="selectedTicketId() !== null" [ticketId]="selectedTicketId()"
+  (closed)="closeTicket()" (externalReferenceChanged)="updateTicketReference($event)" />
