@@ -4,7 +4,7 @@ import { credentialsInterceptor } from './credentials.interceptor';
 
 describe('credentialsInterceptor', () => {
   it('adds credentials to API requests', () => {
-    const request = new HttpRequest('GET', '/v1/portal-cliente/tickets');
+    const request = new HttpRequest('GET', '/v1/gem-clientes/tickets');
     let forwarded = false;
 
     credentialsInterceptor(request, (nextRequest) => {

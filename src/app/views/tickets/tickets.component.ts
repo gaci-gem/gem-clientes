@@ -8,8 +8,8 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { PortalClientTicket } from '../../core/models/portal-client-ticket.model';
-import { PortalClientTicketsService } from '../../core/services/portal-client-tickets.service';
+import { GemClientesTicket } from '../../core/models/gem-clientes-ticket.model';
+import { GemClientesTicketsService } from '../../core/services/gem-clientes-tickets.service';
 import { DrawerTicketComponent } from './drawer-ticket/drawer-ticket.component';
 import { NgIcon } from '@ng-icons/core';
 
@@ -32,10 +32,10 @@ import { NgIcon } from '@ng-icons/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TicketsComponent implements OnInit {
-  private readonly ticketsService = inject(PortalClientTicketsService);
+  private readonly ticketsService = inject(GemClientesTicketsService);
   private cdr = inject(ChangeDetectorRef);
 
-  readonly tickets = signal<PortalClientTicket[]>([]);
+  readonly tickets = signal<GemClientesTicket[]>([]);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly selectedTicketId = signal<number | null>(null);
@@ -123,7 +123,7 @@ export class TicketsComponent implements OnInit {
     return severities[status] ?? 'secondary';
   }
 
-  openTicket(ticket: PortalClientTicket): void {
+  openTicket(ticket: GemClientesTicket): void {
     this.selectedTicketId.set(ticket.id);
   }
 

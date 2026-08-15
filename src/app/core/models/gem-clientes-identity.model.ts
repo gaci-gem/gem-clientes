@@ -1,4 +1,4 @@
-export interface PortalClientIdentity {
+export interface GemClientesIdentity {
   clienteId: number;
   name: string | null;
 }

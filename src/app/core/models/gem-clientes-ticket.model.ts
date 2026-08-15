@@ -1,4 +1,4 @@
-export interface PortalClientTicket {
+export interface GemClientesTicket {
   id: number;
   subject: string;
   description: string;
@@ -8,7 +8,7 @@ export interface PortalClientTicket {
   updatedAt: string;
 }
 
-export interface PortalClientTicketEvent {
+export interface GemClientesTicketEvent {
   id: string;
   type: string;
   code: string;
@@ -16,21 +16,21 @@ export interface PortalClientTicketEvent {
   visibleState: 'OPEN' | 'CLOSED';
 }
 
-export interface PortalClientTicketDetail extends PortalClientTicket {
-  comments: PortalClientTicketComment[];
-  events: PortalClientTicketEvent[];
-  attachments?: PortalClientTicketAttachment[];
+export interface GemClientesTicketDetail extends GemClientesTicket {
+  comments: GemClientesTicketComment[];
+  events: GemClientesTicketEvent[];
+  attachments?: GemClientesTicketAttachment[];
 }
 
-export interface PortalClientTicketComment {
+export interface GemClientesTicketComment {
   id: number;
   text: string;
   createdAt: string;
   updatedAt: string;
-  attachments?: PortalClientTicketAttachment[];
+  attachments?: GemClientesTicketAttachment[];
 }
 
-export interface PortalClientTicketAttachment {
+export interface GemClientesTicketAttachment {
   id: string;
   name: string;
   mimeType: string;
@@ -40,7 +40,7 @@ export interface PortalClientTicketAttachment {
   downloadUrl: string;
 }
 
-export interface CreatePortalClientTicket {
+export interface CreateGemClientesTicket {
   subject: string;
   description: string;
   externalReference?: string;

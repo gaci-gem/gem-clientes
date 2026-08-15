@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { of, throwError } from 'rxjs';
-import { PortalClientTicketsService } from '../../core/services/portal-client-tickets.service';
+import { GemClientesTicketsService } from '../../core/services/gem-clientes-tickets.service';
 import { TicketsComponent } from './tickets.component';
 import { DrawerTicketComponent } from './drawer-ticket/drawer-ticket.component';
 
 describe('TicketsComponent', () => {
   let fixture: ComponentFixture<TicketsComponent>;
-  let service: jasmine.SpyObj<PortalClientTicketsService>;
+  let service: jasmine.SpyObj<GemClientesTicketsService>;
 
   beforeEach(() => {
-    service = jasmine.createSpyObj('PortalClientTicketsService', ['listTickets', 'getTicket', 'createTicket', 'addComment', 'updateExternalReference']);
+    service = jasmine.createSpyObj('GemClientesTicketsService', ['listTickets', 'getTicket', 'createTicket', 'addComment', 'updateExternalReference']);
     TestBed.configureTestingModule({
       imports: [TicketsComponent],
-      providers: [{ provide: PortalClientTicketsService, useValue: service }],
+      providers: [{ provide: GemClientesTicketsService, useValue: service }],
     });
   });
 

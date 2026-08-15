@@ -18,23 +18,23 @@ describe('AuthService', () => {
 
   afterEach(() => { http.verify(); sessionStorage.clear(); });
 
-  it('logs in with the portal contract and marks the cookie session', () => {
+  it('logs in with the GEM Clientes contract and marks the cookie session', () => {
     service.login('cliente-1', 'secret').subscribe();
-    const request = http.expectOne(`${environment.apiBaseUrl}/v1/portal-cliente/auth/login`);
+    const request = http.expectOne(`${environment.apiBaseUrl}/v1/gem-clientes/auth/login`);
     expect(request.request.method).toBe('POST');
     expect(request.request.body).toEqual({ login: 'cliente-1', password: 'secret' });
     request.flush({ authenticated: true });
-    const identityRequest = http.expectOne(`${environment.apiBaseUrl}/v1/portal-cliente/auth/me`);
+    const identityRequest = http.expectOne(`${environment.apiBaseUrl}/v1/gem-clientes/auth/me`);
     expect(identityRequest.request.method).toBe('GET');
     expect(identityRequest.request.withCredentials).toBeTrue();
     identityRequest.flush({ clienteId: 1, name: 'Client One' });
     expect(service.isAuthenticated()).toBeTrue();
   });
 
-  it('logs out through the portal endpoint', () => {
+  it('logs out through the GEM Clientes endpoint', () => {
     sessionStorage.setItem('gem_clientes_authenticated', 'true');
     service.logout().subscribe();
-    const request = http.expectOne(`${environment.apiBaseUrl}/v1/portal-cliente/auth/logout`);
+    const request = http.expectOne(`${environment.apiBaseUrl}/v1/gem-clientes/auth/logout`);
     expect(request.request.method).toBe('POST');
     request.flush(null);
     expect(service.isAuthenticated()).toBeFalse();

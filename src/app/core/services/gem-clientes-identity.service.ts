@@ -2,21 +2,21 @@ import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { catchError, Observable, of, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { PortalClientIdentity } from '../models/portal-client-identity.model';
+import { GemClientesIdentity } from '../models/gem-clientes-identity.model';
 
 @Injectable({ providedIn: 'root' })
-export class PortalClientIdentityService {
+export class GemClientesIdentityService {
   private readonly http = inject(HttpClient);
 
-  readonly identity = signal<PortalClientIdentity | null>(null);
+  readonly identity = signal<GemClientesIdentity | null>(null);
   readonly loading = signal(false);
   readonly error = signal<string | null>(null);
   readonly displayName = computed(() => this.identity()?.name?.trim() || 'Cliente');
 
-  load(): Observable<PortalClientIdentity | null> {
+  load(): Observable<GemClientesIdentity | null> {
     this.loading.set(true);
     this.error.set(null);
-    return this.http.get<PortalClientIdentity>(`${environment.apiBaseUrl}/v1/portal-cliente/auth/me`).pipe(
+    return this.http.get<GemClientesIdentity>(`${environment.apiBaseUrl}/v1/gem-clientes/auth/me`).pipe(
       tap((identity) => this.identity.set(identity)),
       catchError(() => {
         this.identity.set(null);

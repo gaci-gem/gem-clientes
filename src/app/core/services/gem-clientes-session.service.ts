@@ -1,10 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { PortalClientIdentityService } from './portal-client-identity.service';
+import { GemClientesIdentityService } from './gem-clientes-identity.service';
 
 @Injectable({ providedIn: 'root' })
-export class PortalClientSessionService {
-  private readonly identity = inject(PortalClientIdentityService);
+export class GemClientesSessionService {
+  private readonly identity = inject(GemClientesIdentityService);
   private readonly router = inject(Router);
   private redirectStarted = false;
 

@@ -3,19 +3,19 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
-export interface ChangePortalClientPasswordRequest {
+export interface ChangeGemClientesPasswordRequest {
   currentPassword: string;
   newPassword: string;
   confirmation: string;
 }
 
 @Injectable({ providedIn: 'root' })
-export class PortalClientPasswordService {
+export class GemClientesPasswordService {
   private readonly http = inject(HttpClient);
 
-  changePassword(payload: ChangePortalClientPasswordRequest): Observable<{ authenticated: true }> {
+  changePassword(payload: ChangeGemClientesPasswordRequest): Observable<{ authenticated: true }> {
     return this.http.post<{ authenticated: true }>(
-      `${environment.apiBaseUrl}/v1/portal-cliente/auth/password`,
+      `${environment.apiBaseUrl}/v1/gem-clientes/auth/password`,
       payload,
     );
   }

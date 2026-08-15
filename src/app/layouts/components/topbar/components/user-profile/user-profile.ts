@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, inject, OnInit, AfterViewInit } from '@angular/core'
 import { AuthService } from '../../../../../core/services/auth.service'
-import { PortalClientIdentityService } from '../../../../../core/services/portal-client-identity.service'
+import { GemClientesIdentityService } from '../../../../../core/services/gem-clientes-identity.service'
 import {
   NgbDropdown,
   NgbDropdownMenu,
@@ -31,7 +31,7 @@ import { NgIcon } from '@ng-icons/core'
 export class UserProfile implements OnInit, AfterViewInit {
   private router = inject(Router)
   private authService = inject(AuthService)
-  protected identity = inject(PortalClientIdentityService)
+  protected identity = inject(GemClientesIdentityService)
   // private usuarioService = inject(UsuarioService);
   // private userStorageService = inject(UserStorageService);
   private cdr = inject(ChangeDetectorRef);

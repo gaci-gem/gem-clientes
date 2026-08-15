@@ -5,8 +5,8 @@ import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { DrawerModule } from 'primeng/drawer';
 import { TagModule } from 'primeng/tag';
-import { PortalClientTicketDetail } from '../../../core/models/portal-client-ticket.model';
-import { PortalClientTicketsService } from '../../../core/services/portal-client-tickets.service';
+import { GemClientesTicketDetail } from '../../../core/models/gem-clientes-ticket.model';
+import { GemClientesTicketsService } from '../../../core/services/gem-clientes-tickets.service';
 import { environment } from '../../../../environments/environment';
 
 @Component({
@@ -24,7 +24,7 @@ import { environment } from '../../../../environments/environment';
 })
 export class DrawerTicketComponent {
   readonly apiBaseUrl = environment.apiBaseUrl;
-  private readonly service = inject(PortalClientTicketsService);
+  private readonly service = inject(GemClientesTicketsService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   @Input() visible = false;
@@ -32,7 +32,7 @@ export class DrawerTicketComponent {
   @Output() closed = new EventEmitter<void>();
   @Output() externalReferenceChanged = new EventEmitter<string | null>();
 
-  ticket: PortalClientTicketDetail | null = null;
+  ticket: GemClientesTicketDetail | null = null;
   loading = false;
   error: string | null = null;
   commentDraft = '';

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
-import { PortalClientPasswordService } from '../../core/services/portal-client-password.service';
+import { GemClientesPasswordService } from '../../core/services/gem-clientes-password.service';
 
 @Component({
   selector: 'app-account',
@@ -12,7 +12,7 @@ import { PortalClientPasswordService } from '../../core/services/portal-client-p
 })
 export class AccountComponent {
   private readonly formBuilder = inject(FormBuilder);
-  private readonly passwordService = inject(PortalClientPasswordService);
+  private readonly passwordService = inject(GemClientesPasswordService);
 
   protected readonly passwordForm = this.formBuilder.nonNullable.group({
     currentPassword: ['', Validators.required],

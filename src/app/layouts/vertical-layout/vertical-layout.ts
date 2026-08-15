@@ -5,7 +5,7 @@ import { debounceTime, fromEvent, Subscription } from "rxjs";
 import { SidenavComponent } from "../components/sidenav/sidenav.component";
 import { Topbar } from "../components/topbar/topbar";
 import { Footer } from "../components/footer/footer";
-import { PortalClientIdentityService } from "../../core/services/portal-client-identity.service";
+import { GemClientesIdentityService } from "../../core/services/gem-clientes-identity.service";
 
 
 @Component({
@@ -26,7 +26,7 @@ import { PortalClientIdentityService } from "../../core/services/portal-client-i
 })
 export class VerticalLayout implements OnInit, OnDestroy {
 
-  constructor(public layout: LayoutStoreService, private identity: PortalClientIdentityService) { }
+  constructor(public layout: LayoutStoreService, private identity: GemClientesIdentityService) { }
   resizeSubscription!: Subscription
 
   ngOnInit() {
