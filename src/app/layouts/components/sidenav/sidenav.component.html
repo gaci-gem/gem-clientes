@@ -9,7 +9,11 @@
     <app-menu />
   </ngx-simplebar>
   <div class="menu-collapse-box d-none d-xl-block">
-    <button class="btn btn-link button-collapse-toggle" (click)="toggleCollapseMenu()" type="button">
+    <button type="button" class="btn btn-link button-collapse-toggle mb-2" (click)="openChangelog()">
+      <ng-icon name="lucideSparkles" class="align-middle flex-shrink-0" />
+      <span>Novedades</span>
+    </button>
+    <button type="button" class="btn btn-link button-collapse-toggle" (click)="toggleCollapseMenu()">
       <ng-icon name="lucideSquareChevronLeft" class=".align-middle flex-shrink-0" />
       <span>Colapsar Menu</span>
     </button>

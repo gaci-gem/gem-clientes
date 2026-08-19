@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { provideRouter } from '@angular/router'
 import { provideIcons } from '@ng-icons/core'
-import { lucideCircleGauge, lucideSquareChevronLeft } from '@ng-icons/lucide'
+import { lucideCircleGauge, lucideSparkles, lucideSquareChevronLeft } from '@ng-icons/lucide'
 
 import { SidenavComponent } from './sidenav.component'
 
@@ -14,7 +14,7 @@ describe('SidenavComponent', () => {
       imports: [SidenavComponent],
       providers: [
         provideRouter([]),
-        provideIcons({ lucideCircleGauge, lucideSquareChevronLeft }),
+        provideIcons({ lucideCircleGauge, lucideSparkles, lucideSquareChevronLeft }),
       ],
     }).compileComponents()
 

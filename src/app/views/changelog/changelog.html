@@ -1,0 +1,54 @@
+<div class="changelog-page" [class.changelog-modal-view]="isModalView">
+  @if (!isModalView) {
+    <app-ui-card [withTitle]="false">
+      <div card-body>
+        <header class="changelog-header">
+          <h1><i class="pi pi-megaphone"></i> Novedades</h1>
+          <p>Historial de cambios y nuevas funcionalidades</p>
+        </header>
+        <div class="changelog-timeline"><ng-container *ngTemplateOutlet="timelineContent" /></div>
+      </div>
+    </app-ui-card>
+  } @else {
+    <div class="changelog-timeline modal-timeline"><ng-container *ngTemplateOutlet="timelineContent" /></div>
+    <div class="changelog-footer">
+      <button type="button" class="btn btn-outline-primary" (click)="navigateToFullChangelog()"><i class="pi pi-history"></i> Ver anteriores</button>
+      <button type="button" class="btn btn-primary" (click)="closeModal()">Entendido</button>
+    </div>
+  }
+</div>
+
+<ng-template #timelineContent>
+  <div class="timeline-line"></div>
+  @for (entry of displayedChangelog; track entry.version; let isFirst = $first) {
+    <details class="version-details" [attr.open]="shouldExpand(entry) ? '' : null">
+      <summary class="version-summary">
+        <span class="timeline-dot" [class.current]="isCurrentVersion(entry)" [class.future]="entry.isFuture"></span>
+        <span class="version-info">
+          <span class="version-title">
+            @if (entry.isFuture) { <span class="badge bg-info-subtle text-info">Próximamente</span> }
+            {{ entry.version }}
+            @if (isFirst && currentBuild() && !entry.isFuture) { <small>(Build: {{ currentBuild() }})</small> }
+          </span>
+          <span class="version-date">{{ entry.isFuture ? ('Est: ' + entry.estimatedDate) : entry.date }}</span>
+          <i class="pi pi-chevron-down expand-icon"></i>
+        </span>
+      </summary>
+      <div class="changes-list">
+        @for (group of getGroupedChanges(entry); track group.type) {
+          <div class="change-item">
+            <span class="change-icon" [ngClass]="getChangeClass(group.type)"><i [class]="getChangeIcon(group.type)"></i></span>
+            <div class="change-content"><span class="badge" [ngClass]="getChangeBadgeClass(group.type)">{{ getChangeLabel(group.type) }}</span>
+              @for (item of group.items; track $index) {
+                <p>- {{ item.text }}
+                  @if (item.link) { <a (click)="navigateToFeature(item.link)" role="button" pTooltip="Ver Funcionalidad"><ng-icon name="lucideExternalLink" /></a> }
+                  @if (item.urlReport) { <a (click)="navigateToReport(item.urlReport)" role="button" pTooltip="Ver Reporte"><ng-icon name="lucideFilePen" /></a> }
+                </p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </details>
+  }
+</ng-template>

@@ -1,14 +1,17 @@
 {
   "name": "gem-clientes",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "prebuild": "npm run write-version",
     "build:development": "ng build --configuration development",
+    "prebuild:development": "npm run write-version",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "write-version": "node tools/write-version.js"
   },
   "dependencies": {
     "@angular/animations": "^21.0.7",
