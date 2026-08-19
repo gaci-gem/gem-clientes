@@ -21,8 +21,8 @@ export const credits = {
   buyLink: '',
 }
 
-export const appName = 'GEM'
-export const appTitle = 'Gaci Eventos'
+export const appName = 'GEM Clientes'
+export const appTitle = 'GEM Clientes'
 export const appLogo = 'assets/images/LOGO.svg'
 export const appLogoCompleto_light = 'assets/images/GEM-CLIENTES-Blanco.png'
 export const appLogoCompleto_dark = 'assets/images/GEM-CLIENTES-Negro.png'
