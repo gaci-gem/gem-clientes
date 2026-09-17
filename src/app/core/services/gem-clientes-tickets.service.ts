@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import {
@@ -9,13 +10,23 @@ import {
   GemClientesTicketDetail,
 } from '../models/gem-clientes-ticket.model';
 
+export interface GemClientesTicketFilters {
+  search?: string;
+  estado?: string;
+  createdFrom?: string;
+  createdTo?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class GemClientesTicketsService {
   private readonly http = inject(HttpClient);
 
-  listTickets(): Observable<GemClientesTicket[]> {
+  listTickets(filters: GemClientesTicketFilters = {}): Observable<GemClientesTicket[]> {
+    let params = new HttpParams();
+    for (const [key, value] of Object.entries(filters)) if (value) params = params.set(key, value);
     return this.http.get<GemClientesTicket[]>(
       `${environment.apiBaseUrl}/v1/gem-clientes/tickets`,
+      { params },
     );
   }
 

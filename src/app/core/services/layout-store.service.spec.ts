@@ -7,6 +7,8 @@ describe('LayoutStoreService', () => {
   beforeEach(() => {
     localStorage.removeItem(STORAGE_KEY);
     document.documentElement.removeAttribute('data-skin');
+    document.documentElement.removeAttribute('data-bs-theme');
+    document.documentElement.classList.remove('theme-switching');
     TestBed.configureTestingModule({ providers: [LayoutStoreService] });
   });
 
@@ -24,5 +26,23 @@ describe('LayoutStoreService', () => {
 
     expect(service.skin).toBe('spotify');
     expect(document.documentElement.getAttribute('data-skin')).toBe('spotify');
+  });
+
+  it('keeps theme switching disabled until the next animation frame', () => {
+    const frameCallbacks: FrameRequestCallback[] = [];
+    spyOn(window, 'requestAnimationFrame').and.callFake((callback) => {
+      frameCallbacks.push(callback);
+      return frameCallbacks.length;
+    });
+
+    const service = TestBed.inject(LayoutStoreService);
+    service.setTheme('dark', false);
+
+    expect(document.documentElement.getAttribute('data-bs-theme')).toBe('dark');
+    expect(document.documentElement.classList.contains('theme-switching')).toBeTrue();
+
+    frameCallbacks[0]?.(0);
+
+    expect(document.documentElement.classList.contains('theme-switching')).toBeFalse();
   });
 });

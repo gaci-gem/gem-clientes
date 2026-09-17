@@ -17,6 +17,8 @@ const defaultState: LayoutState = {
 export class LayoutStoreService {
   readonly state = signal<LayoutState>(this.loadState());
   private readonly html = document.documentElement;
+  private themeSwitchFrame: number | null = null;
+  private appliedTheme: 'light' | 'dark' | null = null;
   private readonly layoutStateSubject = new BehaviorSubject<LayoutState>(this.state());
   readonly layoutState$ = this.layoutStateSubject.asObservable();
 
@@ -39,7 +41,10 @@ export class LayoutStoreService {
   }
 
   setTheme(theme: LayoutState['theme'], persist = true): void {
-    this.updateState({ theme }, persist);
+    this.applyTheme(theme);
+    this.state.update((current) => ({ ...current, theme }));
+    if (persist) this.persistToStorage();
+    this.layoutStateSubject.next(this.state());
   }
 
   setLayoutPosition(position: LayoutState['position'], persist = true): void {
@@ -162,12 +167,34 @@ export class LayoutStoreService {
   private applyAllAttributes(): void {
     const current = this.state();
     this.setHtmlAttribute('data-skin', current.skin);
-    this.setHtmlAttribute('data-bs-theme', current.theme === 'system' ? this.getSystemTheme() : current.theme);
+    this.applyTheme(current.theme);
     this.setHtmlAttribute('data-layout-position', current.position);
     this.setHtmlAttribute('data-topbar-color', current.topbar.color);
     this.setHtmlAttribute('data-sidenav-color', current.sidenav.color);
     this.setHtmlAttribute('data-sidenav-size', current.sidenav.size);
     this.setHtmlAttribute('data-sidenav-user', String(current.sidenav.user));
     this.html.classList.toggle('monochrome', current.monochrome);
+  }
+
+  private applyTheme(theme: LayoutState['theme']): void {
+    const resolvedTheme = theme === 'system' ? this.getSystemTheme() : theme;
+
+    if (
+      this.appliedTheme === resolvedTheme &&
+      this.html.getAttribute('data-bs-theme') === resolvedTheme
+    ) {
+      return;
+    }
+
+    this.html.classList.add('theme-switching');
+    this.setHtmlAttribute('data-bs-theme', resolvedTheme);
+    this.appliedTheme = resolvedTheme;
+
+    if (this.themeSwitchFrame === null) {
+      this.themeSwitchFrame = requestAnimationFrame(() => {
+        this.html.classList.remove('theme-switching');
+        this.themeSwitchFrame = null;
+      });
+    }
   }
 }
