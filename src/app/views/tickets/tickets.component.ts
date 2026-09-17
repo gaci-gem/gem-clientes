@@ -8,10 +8,10 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { GemClientesTicket } from '../../core/models/gem-clientes-ticket.model';
-import { GemClientesTicketsService } from '../../core/services/gem-clientes-tickets.service';
+import { ToolbarModule } from 'primeng/toolbar';
+import { GemClientesTicket, validateTicketAttachments, TICKET_ATTACHMENT_ACCEPT } from '../../core/models/gem-clientes-ticket.model';
+import { GemClientesTicketFilters, GemClientesTicketsService } from '../../core/services/gem-clientes-tickets.service';
 import { DrawerTicketComponent } from './drawer-ticket/drawer-ticket.component';
-import { NgIcon } from '@ng-icons/core';
 
 @Component({
   selector: 'app-tickets',
@@ -25,8 +25,8 @@ import { NgIcon } from '@ng-icons/core';
     InputTextModule,
     TableModule,
     TagModule,
+    ToolbarModule,
     UiCard,
-    NgIcon,
   ],
   templateUrl: './tickets.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,6 +38,7 @@ export class TicketsComponent implements OnInit {
   readonly tickets = signal<GemClientesTicket[]>([]);
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
+  readonly filterError = signal<string | null>(null);
   readonly selectedTicketId = signal<number | null>(null);
   readonly createDialogVisible = signal(false);
   readonly createLoading = signal(false);
@@ -47,6 +48,10 @@ export class TicketsComponent implements OnInit {
   readonly newExternalReference = signal('');
   readonly newFiles = signal<File[]>([]);
   searchValue = signal('');
+  statusFilter = signal('');
+  createdFrom = signal('');
+  createdTo = signal('');
+  readonly attachmentAccept = TICKET_ATTACHMENT_ACCEPT;
 
   ngOnInit(): void {
     this.loadTickets();
@@ -55,7 +60,7 @@ export class TicketsComponent implements OnInit {
   loadTickets(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.ticketsService.listTickets().pipe(
+    this.ticketsService.listTickets(this.filters()).pipe(
       finalize(() => {
         this.loading.set(false);
         this.cdr.detectChanges();
@@ -64,6 +69,26 @@ export class TicketsComponent implements OnInit {
       next: (tickets) => this.tickets.set(tickets),
       error: () => this.error.set('No pudimos cargar tus tickets. Intentá nuevamente.'),
     });
+  }
+
+  filters(): GemClientesTicketFilters {
+    return {
+      ...(this.searchValue().trim() ? { search: this.searchValue().trim() } : {}),
+      ...(this.statusFilter() ? { estado: this.statusFilter() } : {}),
+      ...(this.createdFrom() ? { createdFrom: this.createdFrom() } : {}),
+      ...(this.createdTo() ? { createdTo: this.createdTo() } : {}),
+    };
+  }
+
+  hasActiveFilters(): boolean { return Object.keys(this.filters()).length > 0; }
+
+  applyFilters(): void {
+    if (this.createdFrom() && this.createdTo() && this.createdFrom() > this.createdTo()) {
+      this.filterError.set('La fecha desde debe ser anterior o igual a la fecha hasta.');
+      return;
+    }
+    this.filterError.set(null);
+    this.loadTickets();
   }
 
   openCreateDialog(): void {
@@ -81,6 +106,11 @@ export class TicketsComponent implements OnInit {
     const externalReference = this.newExternalReference().trim();
     if (!subject || !description) {
       this.createError.set('Completá el asunto y la descripción.');
+      return;
+    }
+    const attachmentError = validateTicketAttachments(this.newFiles());
+    if (attachmentError) {
+      this.createError.set(attachmentError);
       return;
     }
 
@@ -104,7 +134,12 @@ export class TicketsComponent implements OnInit {
     });
   }
 
-  onNewFiles(event: Event): void { this.newFiles.set(Array.from((event.target as HTMLInputElement).files ?? [])); }
+  onNewFiles(event: Event): void {
+    const files = Array.from((event.target as HTMLInputElement).files ?? []);
+    const error = validateTicketAttachments(files);
+    this.createError.set(error);
+    if (!error) this.newFiles.set(files);
+  }
 
   descriptionExcerpt(description: string): string {
     const normalized = description.trim().replace(/\s+/g, ' ');
@@ -123,6 +158,17 @@ export class TicketsComponent implements OnInit {
     return severities[status] ?? 'secondary';
   }
 
+  statusLabel(status: string): string {
+    return ({
+      INGRESADO: 'Ingresado',
+      EN_REVISION: 'En revisión',
+      EN_DESARROLLO: 'En desarrollo',
+      RESUELTO: 'Resuelto',
+      CERRADO: 'Cerrado',
+      RECHAZADO: 'Rechazado',
+    } as Record<string, string>)[status] ?? status;
+  }
+
   openTicket(ticket: GemClientesTicket): void {
     this.selectedTicketId.set(ticket.id);
   }
@@ -139,12 +185,14 @@ export class TicketsComponent implements OnInit {
     ));
   }
   
-  clear(table: Table) {
-    table.clear();
+  clear(table?: Table) {
+    table?.clear();
     this.searchValue.set('');
+    this.statusFilter.set('');
+    this.createdFrom.set('');
+    this.createdTo.set('');
+    this.filterError.set(null);
+    this.loadTickets();
     this.cdr.detectChanges();
   }
-  getEventValue($event:any) :string {
-    return $event.target.value;
-  } 
 }

@@ -8,8 +8,13 @@
 
 // var(--ins-card-bg)
 :root {
-  /* Asegura que exista --ins-card-bg; usa --ins-secondary-bg si no está definida por el tema */
-  --ins-card-bg: var(--ins-card-bg, var(--ins-secondary-bg));
+  --ins-card-bg: var(--ins-secondary-bg, var(--ins-body-bg));
+  --p-content-background: var(--ins-card-bg);
+  --p-content-color: var(--ins-body-color);
+  --p-form-field-background: var(--ins-secondary-bg);
+  --p-form-field-color: var(--ins-body-color);
+  --p-form-field-border-color: var(--ins-border-color);
+  --p-form-field-placeholder-color: var(--ins-secondary-color);
   --p-toolbar-background: var(--ins-card-bg);
   --p-datatable-header-background: var(--ins-card-bg);
   --p-paginator-background: var(--ins-card-bg);
@@ -18,11 +23,115 @@
   --p-datatable-row-background: var(--ins-card-bg);
 
   --p-inputtext-background: var(--ins-secondary-bg);
-  --p-inputtext-hover-background: var(--ins-secondary-bg);
+  --p-inputtext-hover-background: var(--ins-tertiary-bg);
   --p-inputtext-focus-background: var(--ins-secondary-bg);
   --p-inputtext-filled-background: var(--ins-secondary-bg);
-  --p-inputtext-filled-hover-background: var(--ins-secondary-bg);
+  --p-inputtext-filled-hover-background: var(--ins-tertiary-bg);
   --p-inputtext-filled-focus-background: var(--ins-secondary-bg);
+}
+
+// Prevent the theme colors from animating while the theme attributes change.
+html.theme-switching,
+html.theme-switching *,
+html.theme-switching::before,
+html.theme-switching::after,
+html.theme-switching *::before,
+html.theme-switching *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+[data-bs-theme="dark"] {
+  --p-form-field-background: var(--ins-body-bg);
+  --p-form-field-hover-background: var(--ins-body-bg);
+  --p-form-field-focus-background: var(--ins-body-bg);
+  --p-inputtext-background: var(--ins-body-bg);
+  --p-inputtext-hover-background: var(--ins-body-bg);
+  --p-inputtext-focus-background: var(--ins-body-bg);
+  --p-inputtext-filled-background: var(--ins-body-bg);
+
+  input.p-inputtext,
+  .p-inputtext,
+  .p-datepicker-input,
+  .p-select,
+  .p-multiselect {
+    background: var(--ins-body-bg) !important;
+  }
+
+  --p-datatable-header-background: var(--ins-card-bg);
+  --p-datatable-header-cell-background: var(--ins-card-bg);
+  --p-datatable-row-background: var(--ins-card-bg);
+  --p-datatable-footer-background: var(--ins-card-bg);
+  --p-toolbar-background: var(--ins-card-bg);
+  --p-paginator-background: var(--ins-card-bg);
+
+  .p-toolbar,
+  .p-paginator,
+  .p-datatable,
+  .p-datatable-table-container,
+  .p-datatable-table,
+  .p-datatable-thead > tr > th,
+  .p-datatable-tbody > tr,
+  .p-datatable-tbody > tr > td,
+  .p-datatable-tfoot > tr > td {
+    background: var(--ins-card-bg) !important;
+  }
+}
+
+.tickets-page { padding-block: 1.5rem; }
+.tickets-table .p-datatable-tbody > tr { cursor: default; }
+.tickets-table .ticket-request-column { min-width: 18rem; }
+.ticket-subject { font-weight: 600; }
+.ticket-description { margin: .25rem 0 0; color: var(--ins-secondary-color); font-size: .8125rem; }
+.tickets-summary { border-top: 1px solid var(--ins-border-color); color: var(--ins-secondary-color); font-size: .8125rem; padding: .875rem 0 0; }
+.state-panel, .empty-table-message { padding: 3rem 1rem; text-align: center; color: var(--ins-secondary-color); }
+.state-panel h2, .empty-table-message h2 { color: var(--ins-body-color); font-size: 1rem; font-weight: 600; }
+.state-panel .spinner-border { margin-bottom: .75rem; }
+
+// Keep global search consistent across filter rows.
+.app-filter-row {
+  .p-input-icon-left {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 220px;
+    flex: 0 0 220px;
+  }
+
+  .p-input-icon-left > i {
+    position: absolute;
+    left: 0.75rem;
+    top: 50%;
+    z-index: 1;
+    transform: translateY(-50%);
+    color: var(--ins-secondary-color);
+    pointer-events: none;
+  }
+
+  .p-input-icon-left input.p-inputtext {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 38px;
+    padding-left: 2.25rem;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .tickets-page { padding-block: 1rem; }
+  .app-filter-row {
+    align-items: stretch;
+    flex-direction: column;
+
+    > * {
+      width: 100%;
+      max-width: none;
+    }
+
+    .p-input-icon-left {
+      width: 100%;
+      flex-basis: 100%;
+    }
+  }
 }
 
 .p-datepicker {
@@ -34,6 +143,11 @@
 
 .p-inputtext.p-variant-filled {
   background: var(--ins-secondary-bg) !important;
+}
+
+.p-dialog, .p-drawer {
+  background: var(--ins-card-bg);
+  color: var(--ins-body-color);
 }
 
 .p-multiselect {
@@ -65,4 +179,3 @@ dropzone>.dropzone.dz-wrapper .dz-message .dz-text {
 .dropzone {
   min-height: inherit !important;
 }
-

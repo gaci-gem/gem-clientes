@@ -1,13 +1,8 @@
-<div class="container-fluid">
+<div class="container-fluid tickets-page">
   <div class="row justify-content-center">
     <div class="col-12 mt-3">
-       <app-ui-card title="Tickets">
-         <div card-actions>
-           <button class="btn btn-primary" type="button" (click)="openCreateDialog()">
-             <i class="pi pi-plus me-1" aria-hidden="true"></i> Nuevo ticket
-           </button>
-         </div>
-           <div card-body>
+        <app-ui-card title="Tickets" className="tickets-card">
+          <div card-body>
 
           @if (loading()) {
           <div class="state-panel" role="status" aria-live="polite">
@@ -20,32 +15,42 @@
             <p>{{ errorMessage }}</p>
             <button class="btn btn-primary" type="button" (click)="loadTickets()">Intentar nuevamente</button>
           </div>
-          } @else {
-          <p-table
+           } @else {
+           <p-toolbar styleClass="mb-2 gap-2">
+             <ng-template pTemplate="left">
+               <p-button label="Limpiar filtros" icon="pi pi-filter-slash" severity="secondary" [outlined]="true" (onClick)="clear(dt)" />
+             </ng-template>
+             <ng-template pTemplate="right">
+               <p-button label="Nuevo ticket" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+             </ng-template>
+           </p-toolbar>
+            <div class="app-filter-row d-flex align-items-end gap-3 mb-3 flex-wrap" role="search" aria-label="Filtros de tickets">
+               <div><label class="form-label mb-1" for="ticket-search">Buscar</label><span class="p-input-icon-left">
+                <i class="pi pi-search" aria-hidden="true"></i>
+                <input pInputText type="text" [value]="searchValue()"
+                 (input)="searchValue.set($any($event.target).value)" placeholder="Asunto, descripción o referencia" />
+              </span></div>
+              <div><label class="form-label mb-1" for="ticket-status">Estado</label><select id="ticket-status" class="form-select" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)"><option value="">Todos</option><option value="INGRESADO">Ingresado</option><option value="EN_REVISION">En revisión</option><option value="EN_DESARROLLO">En desarrollo</option><option value="RESUELTO">Resuelto</option><option value="CERRADO">Cerrado</option><option value="RECHAZADO">Rechazado</option></select></div>
+              <div><label class="form-label mb-1" for="ticket-created-from">Creado desde</label><input id="ticket-created-from" class="form-control" type="date" [value]="createdFrom()" (change)="createdFrom.set($any($event.target).value)" /></div>
+              <div><label class="form-label mb-1" for="ticket-created-to">Creado hasta</label><input id="ticket-created-to" class="form-control" type="date" [value]="createdTo()" (change)="createdTo.set($any($event.target).value)" /></div>
+              <p-button label="Aplicar" icon="pi pi-search" (onClick)="applyFilters()" [disabled]="loading()" ariaLabel="Aplicar filtros de tickets" />
+            </div>
+            @if (filterError(); as filterErrorMessage) { <p class="text-danger" role="alert">{{ filterErrorMessage }}</p> }
+           <p-table
             #dt
             [value]="tickets()"
             [loading]="loading()"
             [paginator]="true"
             [rows]="10" [rowsPerPageOptions]="[5, 10, 20]"
             [showCurrentPageReport]="true"
-            [globalFilterFields]="['id', 'subject', 'description', 'externalReference', 'status']"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} tickets"
             [scrollable]="true"
             stripedRows
             size="small"
             dataKey="id"
             styleClass="tickets-table" [tableStyle]="{ 'min-width': '900px' }"
-            ariaLabel="Listado de tickets del GEM Clientese">
-            <ng-template pTemplate="caption">
-                <div class="flex align-items-center justify-content-between" style="display: flex;">
-                    <span class="p-input-icon-left">
-                        <i class="pi pi-search"></i>
-                        <input pInputText style="padding-top: 0.4rem !important;padding-bottom: 0.4rem !important;margin-left: 10px;" class="p-component p-element p-inputtext"  type="text" (input)="dt.filterGlobal(getEventValue($event), 'contains')" placeholder="Buscar..." />
-                    </span>
-                    <button class="btn btn-ghost-gray" placement="top" ngbTooltip="Limpiar Filtros" (click)="clear(dt)"><ng-icon name="tablerFilterOff"/></button>
-                </div>
-            </ng-template>
-            <ng-template #header>
+             ariaLabel="Listado de tickets de GEM Clientes">
+             <ng-template #header>
               <tr>
                  <th scope="col" class="ticket-action-column"><span class="visually-hidden">Ver detalle</span></th>
                 <th pSortableColumn="id" scope="col" class="ticket-id-column">ID <p-sortIcon field="id" /></th>
@@ -68,10 +73,11 @@
                   <div class="ticket-subject">{{ ticket.subject }}</div>
                   <p class="ticket-description">{{ descriptionExcerpt(ticket.description) }}</p>
                 </td> -->
-                <td scope="row" class="ticket-request-column">
-                  {{ ticket.subject }}
-                </td>
-                <td><p-tag [value]="ticket.status" [severity]="statusSeverity(ticket.status)" style="font-size: 12px !important;"/></td>
+                 <td scope="row" class="ticket-request-column">
+                   <div class="ticket-subject">{{ ticket.subject }}</div>
+                   <p class="ticket-description">{{ descriptionExcerpt(ticket.description) }}</p>
+                 </td>
+                 <td><p-tag [value]="statusLabel(ticket.status)" [severity]="statusSeverity(ticket.status)" /></td>
                 <td>{{ ticket.externalReference || 'Sin referencia' }}</td>
                 <td class="ticket-date">{{ ticket.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
                 <td class="ticket-date">{{ ticket.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
@@ -81,15 +87,17 @@
               <tr>
                  <td colspan="7">
                   <div class="empty-table-message" role="status">
-                    <h2>Aún no tenés tickets</h2>
-                    <p>Cuando registres una solicitud, vas a poder consultar acá su estado y seguimiento.</p>
+                     @if (hasActiveFilters()) { <h2>No encontramos tickets</h2><p>Probá ajustar o limpiar los filtros de búsqueda.</p> } @else { <h2>Aún no tenés tickets</h2><p>Cuando registres una solicitud, vas a poder consultar acá su estado y seguimiento.</p> }
                   </div>
                 </td>
               </tr>
             </ng-template>
-          </p-table>
-          }
-           </div>
+             <ng-template pTemplate="summary">
+               <div class="tickets-summary">En total hay {{ tickets().length }} tickets.</div>
+             </ng-template>
+           </p-table>
+           }
+          </div>
       </app-ui-card>
     </div>
   </div>
@@ -104,7 +112,8 @@
   </div>
   <div class="mb-3">
     <label class="form-label" for="ticket-files">Adjuntos <span class="text-muted">(opcional)</span></label>
-    <input id="ticket-files" class="form-control" type="file" multiple (change)="onNewFiles($event)" />
+     <input id="ticket-files" class="form-control" type="file" multiple [accept]="attachmentAccept" (change)="onNewFiles($event)" aria-describedby="ticket-files-help" />
+     <small id="ticket-files-help" class="form-text text-muted">Hasta 10 archivos, 25 MB por archivo y 50 MB en total.</small>
   </div>
   <div class="mb-3">
     <label class="form-label" for="ticket-description">Descripción</label>

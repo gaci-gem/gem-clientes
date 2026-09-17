@@ -33,6 +33,18 @@ describe('GemClientesTicketsService', () => {
     request.flush([]);
   });
 
+  it('sends server-side ticket filters without tenant identifiers', () => {
+    service.listTickets({ search: 'access', estado: 'EN_REVISION', createdFrom: '2026-09-01', createdTo: '2026-09-30' }).subscribe();
+    const request = http.expectOne((req) => req.url === `${environment.apiBaseUrl}/v1/gem-clientes/tickets`);
+
+    expect(request.request.params.get('search')).toBe('access');
+    expect(request.request.params.get('estado')).toBe('EN_REVISION');
+    expect(request.request.params.get('createdFrom')).toBe('2026-09-01');
+    expect(request.request.params.get('createdTo')).toBe('2026-09-30');
+    expect(request.request.urlWithParams).not.toContain('clienteId');
+    request.flush([]);
+  });
+
   it('gets ticket details without sending clienteId', () => {
     service.getTicket(42).subscribe();
     const request = http.expectOne(`${environment.apiBaseUrl}/v1/gem-clientes/tickets/42`);

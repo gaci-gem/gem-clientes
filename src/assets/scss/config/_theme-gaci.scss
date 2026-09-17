@@ -22,11 +22,15 @@ $theme-gaci-colors: (
 
     --#{$prefix}font-sans-serif:        "Montserrat", "Roboto", sans-serif;
 
-    --#{$prefix}body-bg:                #f8fafd;
+    --#{$prefix}body-bg:                color-mix(in srgb, var(--#{$prefix}light) 72%, var(--#{$prefix}primary));
     --#{$prefix}body-font-size:         0.875rem;
-    --#{$prefix}tertiary-bg:            #f8fafd;
-    --#{$prefix}secondary-color:        #575757;
-    --#{$prefix}border-color:           #ebeef3;
+    --#{$prefix}secondary-bg:            var(--#{$prefix}light);
+    --#{$prefix}tertiary-bg:             color-mix(in srgb, var(--#{$prefix}light) 82%, var(--#{$prefix}primary));
+    --#{$prefix}secondary-color:         color-mix(in srgb, var(--#{$prefix}dark) 70%, var(--#{$prefix}light));
+    --#{$prefix}tertiary-color:          color-mix(in srgb, var(--#{$prefix}dark) 50%, var(--#{$prefix}light));
+    --#{$prefix}emphasis-color:          var(--#{$prefix}dark);
+    --#{$prefix}border-color:            color-mix(in srgb, var(--#{$prefix}primary) 12%, var(--#{$prefix}light));
+    --#{$prefix}border-color-translucent: color-mix(in srgb, var(--#{$prefix}primary) 22%, transparent);
     --#{$prefix}border-radius:          .3rem;
 
     // Tipografía
@@ -63,32 +67,32 @@ $theme-gaci-colors: (
 
     // Sidebars
     &[data-sidenav-color="light"] {
-      --#{$prefix}sidenav-bg:                 #ffffff;
-      --#{$prefix}sidenav-border-color:       #ebeef3;
-      --#{$prefix}sidenav-item-color:         #575757;
-      --#{$prefix}sidenav-item-hover-color:   #126aa7;
-      --#{$prefix}sidenav-item-hover-bg:      #f8fafd;
-      --#{$prefix}sidenav-item-active-color:  #126aa7;
-      --#{$prefix}sidenav-item-active-bg:     #f8fafd;
+       --#{$prefix}sidenav-bg:                 var(--#{$prefix}light);
+       --#{$prefix}sidenav-border-color:       var(--#{$prefix}border-color);
+       --#{$prefix}sidenav-item-color:         var(--#{$prefix}secondary-color);
+       --#{$prefix}sidenav-item-hover-color:   var(--#{$prefix}primary);
+       --#{$prefix}sidenav-item-hover-bg:      var(--#{$prefix}tertiary-bg);
+       --#{$prefix}sidenav-item-active-color:  var(--#{$prefix}primary);
+       --#{$prefix}sidenav-item-active-bg:     var(--#{$prefix}tertiary-bg);
     }
 
     &[data-sidenav-color="dark"] {
-      --#{$prefix}sidenav-bg:                 #1c1d28;
-      --#{$prefix}sidenav-border-color:       #1c1d28;
-      --#{$prefix}sidenav-item-color:         #aaaaaa;
-      --#{$prefix}sidenav-item-hover-color:   #ffffff;
-      --#{$prefix}sidenav-item-hover-bg:      #20222e;
-      --#{$prefix}sidenav-item-active-color:  #ffffff;
-      --#{$prefix}sidenav-item-active-bg:     #20222e;
+       --#{$prefix}sidenav-bg:                 var(--#{$prefix}secondary-bg);
+       --#{$prefix}sidenav-border-color:       var(--#{$prefix}border-color);
+       --#{$prefix}sidenav-item-color:         var(--#{$prefix}secondary-color);
+       --#{$prefix}sidenav-item-hover-color:   var(--#{$prefix}light);
+       --#{$prefix}sidenav-item-hover-bg:      var(--#{$prefix}tertiary-bg);
+       --#{$prefix}sidenav-item-active-color:  var(--#{$prefix}light);
+       --#{$prefix}sidenav-item-active-bg:     var(--#{$prefix}tertiary-bg);
     }
 
     // Topbar
     &[data-topbar-color="light"] {
-      --#{$prefix}topbar-bg:                  #ffffff;
-      --#{$prefix}topbar-item-color:          #575757;
-      --#{$prefix}topbar-item-hover-color:    #126aa7;
-      --#{$prefix}topbar-search-bg:           transparent;
-      --#{$prefix}topbar-search-border:       #e7e9eb;
+       --#{$prefix}topbar-bg:                  var(--#{$prefix}light);
+       --#{$prefix}topbar-item-color:          var(--#{$prefix}secondary-color);
+       --#{$prefix}topbar-item-hover-color:    var(--#{$prefix}primary);
+       --#{$prefix}topbar-search-bg:           transparent;
+       --#{$prefix}topbar-search-border:       var(--#{$prefix}border-color);
     }
 
     &[data-topbar-color="dark"] {
@@ -103,13 +107,29 @@ $theme-gaci-colors: (
   @if $enable-dark-mode {
     @include color-mode(dark, true) {
       &[data-skin="gaci"] {
-        --#{$prefix}body-bg:              #17181e;
-        --#{$prefix}tertiary-bg:          #272832;
-        --#{$prefix}border-color:         #252630;
-        --#{$prefix}secondary-bg:         #1b1c22;
-        --#{$prefix}box-shadow:           0px 0px 30px rgba(0, 0, 0, 0.3);
-        --#{$prefix}light:                #35363d;
-        --#{$prefix}dark:                 #4b4d5c;
+         --#{$prefix}body-color:            color-mix(in srgb, var(--#{$prefix}light) 82%, white);
+         --#{$prefix}body-bg:               color-mix(in srgb, var(--#{$prefix}dark) 82%, var(--#{$prefix}primary));
+         --#{$prefix}secondary-bg:         color-mix(in srgb, var(--#{$prefix}dark) 72%, var(--#{$prefix}primary));
+         --#{$prefix}tertiary-bg:          color-mix(in srgb, var(--#{$prefix}dark) 60%, var(--#{$prefix}primary));
+         --#{$prefix}secondary-color:      color-mix(in srgb, var(--#{$prefix}light) 72%, transparent);
+         --#{$prefix}tertiary-color:       color-mix(in srgb, var(--#{$prefix}light) 56%, transparent);
+         --#{$prefix}emphasis-color:       var(--#{$prefix}light);
+         --#{$prefix}border-color:         color-mix(in srgb, var(--#{$prefix}primary) 38%, var(--#{$prefix}dark));
+         --#{$prefix}border-color-translucent: color-mix(in srgb, var(--#{$prefix}primary) 45%, transparent);
+         --#{$prefix}box-shadow:           0 1rem 2rem color-mix(in srgb, var(--#{$prefix}dark) 55%, transparent);
+         --#{$prefix}light:                color-mix(in srgb, var(--#{$prefix}primary) 12%, white);
+         --#{$prefix}dark:                 color-mix(in srgb, var(--#{$prefix}primary) 32%, black);
+         --#{$prefix}sidenav-bg:           var(--#{$prefix}secondary-bg);
+         --#{$prefix}sidenav-border-color: var(--#{$prefix}border-color);
+         --#{$prefix}sidenav-item-color:   var(--#{$prefix}secondary-color);
+         --#{$prefix}sidenav-item-hover-color: var(--#{$prefix}light);
+         --#{$prefix}sidenav-item-hover-bg: var(--#{$prefix}tertiary-bg);
+         --#{$prefix}sidenav-item-active-color: var(--#{$prefix}light);
+         --#{$prefix}sidenav-item-active-bg: var(--#{$prefix}tertiary-bg);
+         --#{$prefix}topbar-bg:             var(--#{$prefix}secondary-bg);
+         --#{$prefix}topbar-item-color:     var(--#{$prefix}secondary-color);
+         --#{$prefix}topbar-item-hover-color: var(--#{$prefix}light);
+         --#{$prefix}topbar-search-border:  var(--#{$prefix}border-color);
       }
     }
   }

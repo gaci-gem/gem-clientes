@@ -22,10 +22,10 @@ export const appConfig: ApplicationConfig = {
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
-          preset: Aura,
-          options: {
-              darkModeSelector: '.my-app-dark'
-          }
+        preset: Aura,
+        options: {
+          darkModeSelector: '[data-bs-theme="dark"]'
+        }
       }
     }),
     {provide: LOCALE_ID, useValue: 'es-AR' }
