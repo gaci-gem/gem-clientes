@@ -8,6 +8,14 @@ export interface GemClientesTicket {
   updatedAt: string;
 }
 
+export interface GemClientesTicketPage {
+  data: GemClientesTicket[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export interface GemClientesTicketEvent {
   id: string;
   type: string;

@@ -39,9 +39,11 @@
            <p-table
             #dt
             [value]="tickets()"
-            [loading]="loading()"
-            [paginator]="true"
-            [rows]="10" [rowsPerPageOptions]="[5, 10, 20]"
+             [loading]="loading()"
+             [lazy]="true"
+             [paginator]="true"
+              [rows]="limit" [rowsPerPageOptions]="[5, 10, 15, 25, 50]" [totalRecords]="total()"
+             (onPage)="onPageChange($event)"
             [showCurrentPageReport]="true"
             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} tickets"
             [scrollable]="true"
@@ -93,7 +95,7 @@
               </tr>
             </ng-template>
              <ng-template pTemplate="summary">
-               <div class="tickets-summary">En total hay {{ tickets().length }} tickets.</div>
+                <div class="tickets-summary">En total hay {{ total() }} tickets.</div>
              </ng-template>
            </p-table>
            }

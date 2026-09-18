@@ -7,10 +7,10 @@ import { DrawerTicketComponent } from './drawer-ticket/drawer-ticket.component';
 
 describe('TicketsComponent', () => {
   let fixture: ComponentFixture<TicketsComponent>;
-  let service: jasmine.SpyObj<GemClientesTicketsService>;
+  let service: jasmine.SpyObj<GemClientesTicketsService> & { listTickets: jasmine.Spy };
 
   beforeEach(() => {
-    service = jasmine.createSpyObj('GemClientesTicketsService', ['listTickets', 'getTicket', 'createTicket', 'addComment', 'updateExternalReference']);
+    service = jasmine.createSpyObj('GemClientesTicketsService', ['listTickets', 'getTicket', 'createTicket', 'addComment', 'updateExternalReference']) as typeof service;
     TestBed.configureTestingModule({
       imports: [TicketsComponent],
       providers: [{ provide: GemClientesTicketsService, useValue: service }],
@@ -119,11 +119,16 @@ describe('TicketsComponent', () => {
     fixture.componentInstance.statusFilter.set('EN_REVISION');
     fixture.componentInstance.createdFrom.set('2026-09-01');
     fixture.componentInstance.createdTo.set('2026-09-30');
+    fixture.componentInstance.page = 3;
+    (fixture.componentInstance as any).table = { first: 20 };
     fixture.componentInstance.applyFilters();
-    expect(service.listTickets).toHaveBeenCalledWith({ search: 'access', estado: 'EN_REVISION', createdFrom: '2026-09-01', createdTo: '2026-09-30' });
+    expect(service.listTickets).toHaveBeenCalledWith({ search: 'access', estado: 'EN_REVISION', createdFrom: '2026-09-01', createdTo: '2026-09-30', page: 1, limit: 10 });
+    expect((fixture.componentInstance as any).table.first).toBe(0);
 
+    (fixture.componentInstance as any).table.first = 20;
     fixture.componentInstance.clear();
-    expect(service.listTickets).toHaveBeenCalledWith({});
+    expect(service.listTickets).toHaveBeenCalledWith({ page: 1, limit: 10 });
+    expect((fixture.componentInstance as any).table.first).toBe(0);
     expect(fixture.componentInstance.hasActiveFilters()).toBeFalse();
   });
 

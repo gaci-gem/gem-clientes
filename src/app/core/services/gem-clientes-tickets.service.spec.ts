@@ -45,6 +45,15 @@ describe('GemClientesTicketsService', () => {
     request.flush([]);
   });
 
+  it('sends the requested server page and limit', () => {
+    service.listTickets({ page: 3, limit: 5 }).subscribe();
+    const request = http.expectOne((req) => req.url === `${environment.apiBaseUrl}/v1/gem-clientes/tickets`);
+
+    expect(request.request.params.get('page')).toBe('3');
+    expect(request.request.params.get('limit')).toBe('5');
+    request.flush({ data: [], total: 12, page: 3, limit: 5, totalPages: 3 });
+  });
+
   it('gets ticket details without sending clienteId', () => {
     service.getTicket(42).subscribe();
     const request = http.expectOne(`${environment.apiBaseUrl}/v1/gem-clientes/tickets/42`);
