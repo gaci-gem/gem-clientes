@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UiCard } from '../../components/ui-card';
@@ -34,8 +34,12 @@ import { DrawerTicketComponent } from './drawer-ticket/drawer-ticket.component';
 export class TicketsComponent implements OnInit {
   private readonly ticketsService = inject(GemClientesTicketsService);
   private cdr = inject(ChangeDetectorRef);
+  @ViewChild('dt') table?: Table;
 
   readonly tickets = signal<GemClientesTicket[]>([]);
+  readonly total = signal(0);
+  page = 1;
+  limit = 10;
   readonly loading = signal(true);
   readonly error = signal<string | null>(null);
   readonly filterError = signal<string | null>(null);
@@ -60,13 +64,17 @@ export class TicketsComponent implements OnInit {
   loadTickets(): void {
     this.loading.set(true);
     this.error.set(null);
-    this.ticketsService.listTickets(this.filters()).pipe(
+    this.ticketsService.listTickets({ ...this.filters(), page: this.page, limit: this.limit }).pipe(
       finalize(() => {
         this.loading.set(false);
         this.cdr.detectChanges();
       }),
     ).subscribe({
-      next: (tickets) => this.tickets.set(tickets),
+      next: (result) => {
+        const page = Array.isArray(result) ? { data: result, total: result.length } : result;
+        this.tickets.set(page.data);
+        this.total.set(page.total);
+      },
       error: () => this.error.set('No pudimos cargar tus tickets. Intentá nuevamente.'),
     });
   }
@@ -88,6 +96,14 @@ export class TicketsComponent implements OnInit {
       return;
     }
     this.filterError.set(null);
+    this.page = 1;
+    if (this.table) this.table.first = 0;
+    this.loadTickets();
+  }
+
+  onPageChange(event: { first?: number; rows?: number }): void {
+    this.limit = event.rows ?? this.limit;
+    this.page = Math.floor((event.first ?? 0) / this.limit) + 1;
     this.loadTickets();
   }
 
@@ -128,6 +144,8 @@ export class TicketsComponent implements OnInit {
     ).subscribe({
       next: () => {
         this.createDialogVisible.set(false);
+        this.page = 1;
+        if (this.table) this.table.first = 0;
         this.loadTickets();
       },
       error: () => this.createError.set('No pudimos crear el ticket. Intentá nuevamente.'),
@@ -192,6 +210,8 @@ export class TicketsComponent implements OnInit {
     this.createdFrom.set('');
     this.createdTo.set('');
     this.filterError.set(null);
+    this.page = 1;
+    if (this.table) this.table.first = 0;
     this.loadTickets();
     this.cdr.detectChanges();
   }
