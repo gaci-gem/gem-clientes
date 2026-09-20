@@ -15,6 +15,28 @@ export interface ChangelogChange {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.2.0',
+    date: '2026-09-20',
+    changes: [
+      {
+        type: 'improvement',
+        text: 'Ahora puedes encontrar y revisar tus tickets más fácilmente desde un portal más claro.',
+      },
+      {
+        type: 'improvement',
+        text: 'Busca y recorre tus tickets más rápido con filtros y paginación.',
+      },
+      {
+        type: 'feature',
+        text: 'Crea solicitudes y agrega archivos adjuntos para compartir toda la información necesaria.',
+      },
+      {
+        type: 'improvement',
+        text: 'Consulta en cada ticket sus comentarios, archivos adjuntos y eventos relacionados.',
+      },
+    ],
+  },
+  {
     version: '0.1.1',
     date: '2026-08-19',
     changes: [
