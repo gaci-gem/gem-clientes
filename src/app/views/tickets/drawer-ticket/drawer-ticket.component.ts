@@ -28,7 +28,8 @@ interface AttachmentPresentation {
     ::ng-deep .ticket-drawer .p-drawer-content { height: 100%; min-height: 0; overflow: hidden; padding: 0 !important; }
     .ticket-drawer-shell { height: 100%; min-height: 0; overflow: hidden; }
     .ticket-drawer-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
-    .ticket-description-content { margin-bottom: 0; }
+    .ticket-description-content { margin-bottom: 0; overflow-wrap: anywhere; word-break: break-word; }
+    .comment-item p { overflow-wrap: anywhere; word-break: break-word; }
     .ticket-details-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-top: 0; font-size: .875rem; }
     .ticket-detail-item { min-width: 0; padding: .75rem; border: 1px solid var(--ins-border-color); border-radius: var(--ins-border-radius, .375rem); display: flex; flex-direction: column; justify-content: center; }
     .ticket-detail-item dt { color: var(--ins-secondary-color); font-size: .875rem; font-weight: 600; margin-bottom: .25rem; }
@@ -124,7 +125,7 @@ export class DrawerTicketComponent {
   }
 
   statusSeverity(status: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {
-    return ({ INGRESADO: 'info', EN_REVISION: 'info', EN_DESARROLLO: 'warn', RESUELTO: 'success', CERRADO: 'secondary', RECHAZADO: 'danger' } as Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary'>)[status] ?? 'secondary';
+     return ({ INGRESADO: 'info', EN_REVISION: 'info', EN_DESARROLLO: 'warn', ESPERANDO_RESPUESTA_CLIENTE: 'warn', CERRADO: 'secondary', RECHAZADO: 'danger' } as Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary'>)[status] ?? 'secondary';
   }
 
   retry(): void {
@@ -148,7 +149,7 @@ export class DrawerTicketComponent {
   }
 
   statusLabel(status: string): string {
-    return ({ INGRESADO: 'Ingresado', EN_REVISION: 'En revisión', EN_DESARROLLO: 'En desarrollo', RESUELTO: 'Resuelto', CERRADO: 'Cerrado', RECHAZADO: 'Rechazado' } as Record<string, string>)[status] ?? status;
+     return ({ INGRESADO: 'Ingresado', EN_REVISION: 'En revisión', EN_DESARROLLO: 'En desarrollo', ESPERANDO_RESPUESTA_CLIENTE: 'Esperando respuesta del cliente', CERRADO: 'Cerrado', RECHAZADO: 'Rechazado' } as Record<string, string>)[status] ?? status.replaceAll('_', ' ');
   }
 
   eventIdentifier(event: { type: string; code: string; title: string }): string {

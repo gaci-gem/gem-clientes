@@ -6,6 +6,7 @@ export interface GemClientesTicket {
   externalReference: string | null;
   createdAt: string;
   updatedAt: string;
+  events?: GemClientesTicketEvent[];
 }
 
 export interface GemClientesTicketPage {

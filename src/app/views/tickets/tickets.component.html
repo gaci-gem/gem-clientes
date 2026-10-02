@@ -30,7 +30,7 @@
                 <input pInputText type="text" [value]="searchValue()"
                  (input)="searchValue.set($any($event.target).value)" placeholder="Asunto, descripción o referencia" />
               </span></div>
-              <div><label class="form-label mb-1" for="ticket-status">Estado</label><select id="ticket-status" class="form-select" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)"><option value="">Todos</option><option value="INGRESADO">Ingresado</option><option value="EN_REVISION">En revisión</option><option value="EN_DESARROLLO">En desarrollo</option><option value="RESUELTO">Resuelto</option><option value="CERRADO">Cerrado</option><option value="RECHAZADO">Rechazado</option></select></div>
+                <div><label class="form-label mb-1" for="ticket-status">Estado</label><select id="ticket-status" class="form-select" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)"><option value="">Todos</option><option value="INGRESADO">Ingresado</option><option value="EN_REVISION">En revisión</option><option value="EN_DESARROLLO">En desarrollo</option><option value="CERRADO">Cerrado (cierra ticket)</option><option value="RECHAZADO">Rechazado (cierra ticket)</option><option value="ESPERANDO_RESPUESTA_CLIENTE">Esperando respuesta del cliente</option></select></div>
               <div><label class="form-label mb-1" for="ticket-created-from">Creado desde</label><input id="ticket-created-from" class="form-control" type="date" [value]="createdFrom()" (change)="createdFrom.set($any($event.target).value)" /></div>
               <div><label class="form-label mb-1" for="ticket-created-to">Creado hasta</label><input id="ticket-created-to" class="form-control" type="date" [value]="createdTo()" (change)="createdTo.set($any($event.target).value)" /></div>
               <p-button label="Aplicar" icon="pi pi-search" (onClick)="applyFilters()" [disabled]="loading()" ariaLabel="Aplicar filtros de tickets" />
@@ -59,7 +59,8 @@
                 <th pSortableColumn="subject" scope="col" class="ticket-request-column">Solicitud <p-sortIcon
                     field="subject" /></th>
                 <th pSortableColumn="status" scope="col">Estado <p-sortIcon field="status" /></th>
-                <th scope="col">Referencia externa</th>
+                 <th scope="col">Referencia externa</th>
+                 <th scope="col">Eventos</th>
                 <th pSortableColumn="createdAt" scope="col">Creado <p-sortIcon field="createdAt" /></th>
                 <th pSortableColumn="updatedAt" scope="col">Actualizado <p-sortIcon field="updatedAt" /></th>
               </tr>
@@ -80,14 +81,21 @@
                    <p class="ticket-description">{{ descriptionExcerpt(ticket.description) }}</p>
                  </td>
                  <td><p-tag [value]="statusLabel(ticket.status)" [severity]="statusSeverity(ticket.status)" /></td>
-                <td>{{ ticket.externalReference || 'Sin referencia' }}</td>
+                 <td>{{ ticket.externalReference || 'Sin referencia' }}</td>
+                 <td>
+                   @if (ticket.events?.length) {
+                     @for (event of ticket.events; track event.id) {
+                        <span class="badge text-bg-light me-1">{{ event.type }}-{{ event.code }}</span>
+                     }
+                   } @else { <span class="text-muted">Sin eventos</span> }
+                 </td>
                 <td class="ticket-date">{{ ticket.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
                 <td class="ticket-date">{{ ticket.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
               </tr>
             </ng-template>
             <ng-template #emptymessage>
               <tr>
-                 <td colspan="7">
+                  <td colspan="8">
                   <div class="empty-table-message" role="status">
                      @if (hasActiveFilters()) { <h2>No encontramos tickets</h2><p>Probá ajustar o limpiar los filtros de búsqueda.</p> } @else { <h2>Aún no tenés tickets</h2><p>Cuando registres una solicitud, vas a poder consultar acá su estado y seguimiento.</p> }
                   </div>

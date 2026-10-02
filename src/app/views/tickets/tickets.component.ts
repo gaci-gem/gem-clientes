@@ -168,10 +168,10 @@ export class TicketsComponent implements OnInit {
     const severities: Record<string, 'success' | 'info' | 'warn' | 'danger' | 'secondary'> = {
       INGRESADO: 'info',
       EN_REVISION: 'info',
-      EN_DESARROLLO: 'warn',
-      RESUELTO: 'success',
-      CERRADO: 'secondary',
-      RECHAZADO: 'danger',
+       EN_DESARROLLO: 'warn',
+        CERRADO: 'secondary',
+        RECHAZADO: 'danger',
+       ESPERANDO_RESPUESTA_CLIENTE: 'warn',
     };
     return severities[status] ?? 'secondary';
   }
@@ -181,10 +181,10 @@ export class TicketsComponent implements OnInit {
       INGRESADO: 'Ingresado',
       EN_REVISION: 'En revisión',
       EN_DESARROLLO: 'En desarrollo',
-      RESUELTO: 'Resuelto',
-      CERRADO: 'Cerrado',
-      RECHAZADO: 'Rechazado',
-    } as Record<string, string>)[status] ?? status;
+        CERRADO: 'Cerrado',
+        RECHAZADO: 'Rechazado',
+       ESPERANDO_RESPUESTA_CLIENTE: 'Esperando respuesta del cliente',
+     } as Record<string, string>)[status] ?? status.replaceAll('_', ' ');
   }
 
   openTicket(ticket: GemClientesTicket): void {

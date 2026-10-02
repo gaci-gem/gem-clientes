@@ -82,7 +82,15 @@ html.theme-switching *::after {
 .tickets-table .p-datatable-tbody > tr { cursor: default; }
 .tickets-table .ticket-request-column { min-width: 18rem; }
 .ticket-subject { font-weight: 600; }
-.ticket-description { margin: .25rem 0 0; color: var(--ins-secondary-color); font-size: .8125rem; }
+.ticket-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin: .25rem 0 0;
+  color: var(--ins-secondary-color);
+  font-size: .8125rem;
+}
 .tickets-summary { border-top: 1px solid var(--ins-border-color); color: var(--ins-secondary-color); font-size: .8125rem; padding: .875rem 0 0; }
 .state-panel, .empty-table-message { padding: 3rem 1rem; text-align: center; color: var(--ins-secondary-color); }
 .state-panel h2, .empty-table-message h2 { color: var(--ins-body-color); font-size: 1rem; font-weight: 600; }

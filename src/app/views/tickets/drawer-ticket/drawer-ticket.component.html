@@ -69,7 +69,7 @@
                 @if (ticket.attachments?.length) { <div class="attachment-list">@for (file of ticket.attachments; track file.id) { <ng-container *ngTemplateOutlet="attachmentCard; context: { $implicit: file }" /> }</div> } @else { <p class="text-muted">Sin adjuntos.</p> }
               </section>
           <section><h4 class="h6">Eventos asociados</h4>
-            @if (ticket.events.length) { @for (event of ticket.events; track event.code + event.type) { <article class="ticket-event border rounded p-2 mb-2"><strong>{{ eventIdentifier(event) }}</strong><p class="mb-0 small">{{ eventStateLabel(event.visibleState) }}</p></article> } } @else { <p class="text-muted">Este ticket no tiene eventos asociados.</p> }
+             @if (ticket.events.length) { @for (event of ticket.events; track event.code + event.type) { <a class="ticket-event border rounded p-2 mb-2 d-block text-decoration-none" [href]="'/evento/evento/' + event.id" target="_blank" rel="noopener" [attr.aria-label]="'Abrir evento ' + event.title"><strong>{{ eventIdentifier(event) }}</strong><p class="mb-0 small">{{ eventStateLabel(event.visibleState) }}</p></a> } } @else { <p class="text-muted">Este ticket no tiene eventos asociados.</p> }
           </section>
         }
       </div>
