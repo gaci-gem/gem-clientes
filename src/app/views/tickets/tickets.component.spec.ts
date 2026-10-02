@@ -58,6 +58,19 @@ describe('TicketsComponent', () => {
     expect(fixture.nativeElement.textContent).not.toContain('Eventos asociados');
   });
 
+  it('reloads the list once when the detail drawer closes', () => {
+    service.listTickets.and.returnValues(of([]), of([]));
+    fixture = TestBed.createComponent(TicketsComponent);
+    fixture.detectChanges();
+    fixture.componentInstance.selectedTicketId.set(1);
+
+    fixture.componentInstance.closeTicket();
+    fixture.componentInstance.closeTicket();
+
+    expect(service.listTickets).toHaveBeenCalledTimes(2);
+    expect(fixture.componentInstance.selectedTicketId()).toBeNull();
+  });
+
   it('creates a ticket and reloads the list', () => {
     service.listTickets.and.returnValues(of([]), of([]));
     service.createTicket.and.returnValue(of({} as any));

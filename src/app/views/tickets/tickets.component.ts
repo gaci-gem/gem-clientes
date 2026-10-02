@@ -192,7 +192,9 @@ export class TicketsComponent implements OnInit {
   }
 
   closeTicket(): void {
+    if (this.selectedTicketId() === null) return;
     this.selectedTicketId.set(null);
+    this.loadTickets();
   }
 
   updateTicketReference(reference: string | null): void {
