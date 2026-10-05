@@ -155,7 +155,7 @@ export class DrawerTicketComponent {
   eventIdentifier(event: { type: string; code: string; title: string }): string {
     const type = event.type.trim().toUpperCase();
     const code = event.code.trim();
-    return `${type}-${/^\d+$/.test(code) ? code.padStart(4, '0') : code} | ${event.title}`;
+    return `${type}-${/^\d+$/.test(code) ? code.padStart(3, '0') : code} | ${event.title}`;
   }
 
   eventStateLabel(state: string): string {
