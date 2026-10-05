@@ -107,6 +107,11 @@ export class TicketsComponent implements OnInit {
     this.loadTickets();
   }
 
+  eventIdentifier(event: { type: string; code: string }): string {
+    const code = event.code.trim();
+    return `${event.type.trim().toUpperCase()}-${/^\d+$/.test(code) ? code.padStart(3, '0') : code}`;
+  }
+
   openCreateDialog(): void {
     this.newSubject.set('');
     this.newDescription.set('');

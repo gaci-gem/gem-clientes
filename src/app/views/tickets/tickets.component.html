@@ -85,7 +85,7 @@
                  <td>
                    @if (ticket.events?.length) {
                      @for (event of ticket.events; track event.id) {
-                        <span class="badge text-bg-light me-1">{{ event.type }}-{{ event.code }}</span>
+                         <span class="badge text-bg-light me-1">{{ eventIdentifier(event) }}</span>
                      }
                    } @else { <span class="text-muted">Sin eventos</span> }
                  </td>
