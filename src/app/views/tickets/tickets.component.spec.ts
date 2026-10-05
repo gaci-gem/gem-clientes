@@ -248,7 +248,7 @@ describe('TicketsComponent', () => {
 
     const events = Array.from(fixture.nativeElement.querySelectorAll('.ticket-event')) as HTMLElement[];
     expect(events).toHaveSize(2);
-    expect(events[0].querySelector('strong')?.textContent).toBe('TICKET-0012 | Access approved');
+    expect(events[0].querySelector('strong')?.textContent).toBe('TICKET-012 | Access approved');
     expect(events[0].querySelector('p')?.textContent?.trim()).toBe('Abierto');
     expect(events[1].querySelector('strong')?.textContent).toBe('NOTE-not-a-number | Needs review');
     expect(events[1].querySelector('p')?.textContent?.trim()).toBe('Cerrado');
