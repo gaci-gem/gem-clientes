@@ -3,10 +3,14 @@ export interface GemClientesTicket {
   subject: string;
   description: string;
   status: string;
+  priority: 'CRITICA' | 'ALTA' | 'MEDIA' | 'BAJA';
+  type: 'CONSULTA' | 'ERROR_INCIDENTE' | 'REQUERIMIENTO_MEJORA' | null;
   externalReference: string | null;
+  observation: string | null;
   createdAt: string;
   updatedAt: string;
   events?: GemClientesTicketEvent[];
+  creator: { id: string; login: string } | null;
 }
 
 export interface GemClientesTicketPage {
@@ -73,4 +77,5 @@ export interface CreateGemClientesTicket {
   description: string;
   externalReference?: string;
   files?: File[];
+  type?: 'CONSULTA' | 'ERROR_INCIDENTE' | 'REQUERIMIENTO_MEJORA';
 }

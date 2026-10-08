@@ -1,0 +1,11 @@
+.tickets-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+}
+
+.tickets-loading-overlay app-loading-spinner {
+  position: absolute;
+  inset: 0;
+  display: block;
+}

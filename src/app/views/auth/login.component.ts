@@ -40,7 +40,10 @@ export class LoginComponent {
     this.auth.login(login, password)
       .pipe(finalize(() => this.isSubmitting = false))
       .subscribe({
-        next: () => void this.router.navigate(['/tickets']),
+        next: () => {
+          const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+          void this.router.navigateByUrl(returnUrl?.startsWith('/shared/ticket/') ? returnUrl : '/tickets');
+        },
         error: () => this.errorMessage = 'No pudimos iniciar sesión. Verificá tus datos e intentá nuevamente.'
       });
   }
