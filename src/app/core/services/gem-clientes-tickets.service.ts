@@ -18,6 +18,8 @@ export interface GemClientesTicketFilters {
   createdTo?: string;
   page?: number;
   limit?: number;
+  prioridad?: string;
+  tipo?: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -38,6 +40,7 @@ export class GemClientesTicketsService {
     body.append('asunto', ticket.subject);
     body.append('descripcion', ticket.description);
     if (ticket.externalReference !== undefined) body.append('referenciaExterna', ticket.externalReference);
+    if (ticket.type) body.append('tipo', ticket.type);
     for (const file of ticket.files ?? []) body.append('archivos', file, file.name);
     return this.http.post<GemClientesTicket>(
       `${environment.apiBaseUrl}/v1/gem-clientes/tickets`,
@@ -45,9 +48,18 @@ export class GemClientesTicketsService {
     );
   }
 
+  updatePriority(id: number, priority: GemClientesTicket['priority']): Observable<GemClientesTicket> { return this.http.patch<GemClientesTicket>(`${environment.apiBaseUrl}/v1/gem-clientes/tickets/${id}/priority`, { priority }); }
+  updateType(id: number, type: GemClientesTicket['type']): Observable<GemClientesTicket> { return this.http.patch<GemClientesTicket>(`${environment.apiBaseUrl}/v1/gem-clientes/tickets/${id}/type`, { type }); }
+
   getTicket(id: number): Observable<GemClientesTicketDetail> {
     return this.http.get<GemClientesTicketDetail>(
       `${environment.apiBaseUrl}/v1/gem-clientes/tickets/${id}`,
+    );
+  }
+
+  resolveSharedTicket(token: string): Observable<{ id: number }> {
+    return this.http.get<{ id: number }>(
+      `${environment.apiBaseUrl}/shared/ticket/${encodeURIComponent(token)}/ticket`,
     );
   }
 

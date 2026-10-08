@@ -7,6 +7,7 @@ import { DrawerModule } from 'primeng/drawer';
 import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { TimeAgoComponent } from '../../../components/time-ago/time-ago';
+import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loading-spinner';
 import { GemClientesTicketAttachment, GemClientesTicketComment, GemClientesTicketDetail, validateTicketAttachments, TICKET_ATTACHMENT_ACCEPT } from '../../../core/models/gem-clientes-ticket.model';
 import { GemClientesTicketsService } from '../../../core/services/gem-clientes-tickets.service';
 import { environment } from '../../../../environments/environment';
@@ -21,7 +22,7 @@ interface AttachmentPresentation {
 @Component({
   selector: 'app-drawer-ticket',
   standalone: true,
-  imports: [ButtonModule, CommonModule, DatePipe, DrawerModule, FormsModule, InputTextModule, TagModule, TimeAgoComponent],
+  imports: [ButtonModule, CommonModule, DatePipe, DrawerModule, FormsModule, InputTextModule, LoadingSpinnerComponent, TagModule, TimeAgoComponent],
   templateUrl: './drawer-ticket.component.html',
   styles: `
     :host { display: block; height: 100%; min-height: 0; }
@@ -84,6 +85,7 @@ export class DrawerTicketComponent {
   externalReferenceEditing = false;
   externalReferenceLoading = false;
   externalReferenceError: string | null = null;
+  prioritySaving = false; typeSaving = false;
   private loadedKey: number | null = null;
   readonly attachmentAccept = TICKET_ATTACHMENT_ACCEPT;
   @ViewChild('commentFileInput') private commentFileInput?: ElementRef<HTMLInputElement>;
@@ -99,7 +101,12 @@ export class DrawerTicketComponent {
       this.loading = false;
       this.cdr.detectChanges();
     })).subscribe({
-      next: (ticket) => { this.ticket = ticket; this.externalReferenceDraft = ticket.externalReference ?? ''; this.externalReferenceEditing = false; this.cdr.detectChanges(); },
+       next: (ticket) => {
+         this.ticket = ticket;
+         this.externalReferenceDraft = ticket.externalReference ?? '';
+         this.externalReferenceEditing = false;
+         this.cdr.detectChanges();
+       },
       error: () => { this.error = 'No pudimos cargar el detalle del ticket. Intentá nuevamente.'; this.cdr.detectChanges(); },
     });
   }
@@ -151,6 +158,11 @@ export class DrawerTicketComponent {
   statusLabel(status: string): string {
      return ({ INGRESADO: 'Ingresado', EN_REVISION: 'En revisión', EN_DESARROLLO: 'En desarrollo', ESPERANDO_RESPUESTA_CLIENTE: 'Esperando respuesta del cliente', CERRADO: 'Cerrado', RECHAZADO: 'Rechazado' } as Record<string, string>)[status] ?? status.replaceAll('_', ' ');
   }
+
+  priorityLabel(value: string): string { return ({ CRITICA: '🔴 Crítica', ALTA: '🟠 Alta', MEDIA: '🟡 Media', BAJA: '🟢 Baja' } as Record<string, string>)[value] ?? '🟡 Media'; }
+  typeLabel(value: string | null): string { return ({ CONSULTA: 'Consultas', ERROR_INCIDENTE: 'Error / Incidente', REQUERIMIENTO_MEJORA: 'Requerimiento / Mejora' } as Record<string, string>)[value ?? ''] ?? 'Sin clasificar'; }
+  updatePriority(value: string): void { if (!this.ticket || this.prioritySaving) return; this.prioritySaving = true; this.service.updatePriority(this.ticket.id, value as GemClientesTicketDetail['priority']).pipe(finalize(() => { this.prioritySaving = false; this.cdr.detectChanges(); })).subscribe({ next: updated => this.ticket = { ...this.ticket!, priority: updated.priority }, error: () => this.cdr.detectChanges() }); }
+  updateType(value: string): void { if (!this.ticket || this.typeSaving) return; this.typeSaving = true; this.service.updateType(this.ticket.id, (value || null) as GemClientesTicketDetail['type']).pipe(finalize(() => { this.typeSaving = false; this.cdr.detectChanges(); })).subscribe({ next: updated => this.ticket = { ...this.ticket!, type: updated.type }, error: () => this.cdr.detectChanges() }); }
 
   eventIdentifier(event: { type: string; code: string; title: string }): string {
     const type = event.type.trim().toUpperCase();

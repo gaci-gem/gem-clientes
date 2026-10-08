@@ -1,15 +1,16 @@
+@if (loading()) {
+  <div class="tickets-loading-overlay" role="status" aria-live="polite" aria-label="Cargando tus tickets">
+    <app-loading-spinner />
+  </div>
+}
+
 <div class="container-fluid tickets-page">
   <div class="row justify-content-center">
     <div class="col-12 mt-3">
         <app-ui-card title="Tickets" className="tickets-card">
           <div card-body>
 
-          @if (loading()) {
-          <div class="state-panel" role="status" aria-live="polite">
-            <span class="spinner-border text-primary" aria-hidden="true"></span>
-            <p>Cargando tus tickets...</p>
-          </div>
-          } @else if (error(); as errorMessage) {
+          @if (error(); as errorMessage) {
           <div class="state-panel" role="alert">
             <h2>No se pudieron cargar los tickets</h2>
             <p>{{ errorMessage }}</p>
@@ -30,7 +31,9 @@
                 <input pInputText type="text" [value]="searchValue()"
                  (input)="searchValue.set($any($event.target).value)" placeholder="Asunto, descripción o referencia" />
               </span></div>
-                <div><label class="form-label mb-1" for="ticket-status">Estado</label><select id="ticket-status" class="form-select" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)"><option value="">Todos</option><option value="INGRESADO">Ingresado</option><option value="EN_REVISION">En revisión</option><option value="EN_DESARROLLO">En desarrollo</option><option value="CERRADO">Cerrado (cierra ticket)</option><option value="RECHAZADO">Rechazado (cierra ticket)</option><option value="ESPERANDO_RESPUESTA_CLIENTE">Esperando respuesta del cliente</option></select></div>
+               <div><label class="form-label mb-1" for="ticket-status">Estado</label><select id="ticket-status" class="form-select" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)"><option value="">Todos</option><option value="INGRESADO">Ingresado</option><option value="EN_REVISION">En revisión</option><option value="EN_DESARROLLO">En desarrollo</option><option value="CERRADO">Cerrado (cierra ticket)</option><option value="RECHAZADO">Rechazado (cierra ticket)</option><option value="ESPERANDO_RESPUESTA_CLIENTE">Esperando respuesta del cliente</option></select></div>
+               <div><label class="form-label mb-1" for="ticket-priority">Prioridad</label><select id="ticket-priority" class="form-select" [value]="priorityFilter()" (change)="priorityFilter.set($any($event.target).value)"><option value="">Todas</option><option value="CRITICA">🔴 Crítica</option><option value="ALTA">🟠 Alta</option><option value="MEDIA">🟡 Media</option><option value="BAJA">🟢 Baja</option></select></div>
+               <div><label class="form-label mb-1" for="ticket-type">Tipo</label><select id="ticket-type" class="form-select" [value]="typeFilter()" (change)="typeFilter.set($any($event.target).value)"><option value="">Todos</option><option value="CONSULTA">Consultas</option><option value="ERROR_INCIDENTE">Error / Incidente</option><option value="REQUERIMIENTO_MEJORA">Requerimiento / Mejora</option></select></div>
               <div><label class="form-label mb-1" for="ticket-created-from">Creado desde</label><input id="ticket-created-from" class="form-control" type="date" [value]="createdFrom()" (change)="createdFrom.set($any($event.target).value)" /></div>
               <div><label class="form-label mb-1" for="ticket-created-to">Creado hasta</label><input id="ticket-created-to" class="form-control" type="date" [value]="createdTo()" (change)="createdTo.set($any($event.target).value)" /></div>
               <p-button label="Aplicar" icon="pi pi-search" (onClick)="applyFilters()" [disabled]="loading()" ariaLabel="Aplicar filtros de tickets" />
@@ -58,7 +61,8 @@
                 <th pSortableColumn="id" scope="col" class="ticket-id-column">ID <p-sortIcon field="id" /></th>
                 <th pSortableColumn="subject" scope="col" class="ticket-request-column">Solicitud <p-sortIcon
                     field="subject" /></th>
-                <th pSortableColumn="status" scope="col">Estado <p-sortIcon field="status" /></th>
+                 <th pSortableColumn="status" scope="col">Estado <p-sortIcon field="status" /></th>
+                 <th scope="col">Prioridad</th><th scope="col">Tipo</th>
                  <th scope="col">Referencia externa</th>
                  <th scope="col">Eventos</th>
                 <th pSortableColumn="createdAt" scope="col">Creado <p-sortIcon field="createdAt" /></th>
@@ -80,13 +84,15 @@
                    <div class="ticket-subject">{{ ticket.subject }}</div>
                    <p class="ticket-description">{{ descriptionExcerpt(ticket.description) }}</p>
                  </td>
-                 <td><p-tag [value]="statusLabel(ticket.status)" [severity]="statusSeverity(ticket.status)" /></td>
+                  <td><p-tag [value]="statusLabel(ticket.status)" [severity]="statusSeverity(ticket.status)" /></td>
+                  <td [attr.aria-label]="'Prioridad: ' + ticket.priority">{{ ticket.priority === 'CRITICA' ? '🔴 Crítica' : ticket.priority === 'ALTA' ? '🟠 Alta' : ticket.priority === 'BAJA' ? '🟢 Baja' : '🟡 Media' }}</td>
+                  <td>{{ ticket.type === 'CONSULTA' ? 'Consultas' : ticket.type === 'ERROR_INCIDENTE' ? 'Error / Incidente' : ticket.type === 'REQUERIMIENTO_MEJORA' ? 'Requerimiento / Mejora' : 'Sin clasificar' }}</td>
                  <td>{{ ticket.externalReference || 'Sin referencia' }}</td>
                  <td>
                    @if (ticket.events?.length) {
                      @for (event of ticket.events; track event.id) {
                          <span class="badge text-bg-light me-1">{{ eventIdentifier(event) }}</span>
-                     }
+            }
                    } @else { <span class="text-muted">Sin eventos</span> }
                  </td>
                 <td class="ticket-date">{{ ticket.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
@@ -95,7 +101,7 @@
             </ng-template>
             <ng-template #emptymessage>
               <tr>
-                  <td colspan="8">
+                   <td colspan="10">
                   <div class="empty-table-message" role="status">
                      @if (hasActiveFilters()) { <h2>No encontramos tickets</h2><p>Probá ajustar o limpiar los filtros de búsqueda.</p> } @else { <h2>Aún no tenés tickets</h2><p>Cuando registres una solicitud, vas a poder consultar acá su estado y seguimiento.</p> }
                   </div>
@@ -115,6 +121,10 @@
 
 <p-dialog header="Nuevo ticket" [modal]="true" [visible]="createDialogVisible()"
   (visibleChange)="createDialogVisible.set($event)" [style]="{ width: 'min(36rem, calc(100vw - 2rem))' }">
+  <div class="mb-3">
+    <label class="form-label" for="ticket-type-create">Tipo <span class="text-muted">(opcional)</span></label>
+    <select id="ticket-type-create" class="form-select" [value]="newType()" (change)="newType.set($any($event.target).value)"><option value="">Sin clasificar</option><option value="CONSULTA">Consultas</option><option value="ERROR_INCIDENTE">Error / Incidente</option><option value="REQUERIMIENTO_MEJORA">Requerimiento / Mejora</option></select>
+  </div>
   <div class="mb-3">
     <label class="form-label" for="ticket-subject">Asunto</label>
     <input pInputText id="ticket-subject" class="w-100" maxlength="200" [ngModel]="newSubject()"
