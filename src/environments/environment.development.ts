@@ -2,4 +2,5 @@ export const environment = {
   production: false,
   BASE_URL: 'http://localhost:4000',
   apiBaseUrl: 'http://localhost:4000',
+  gemWebUrl: 'http://localhost:4200',
 };

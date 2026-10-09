@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UiCard } from '../../components/ui-card';
 import { finalize } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { Table, TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToolbarModule } from 'primeng/toolbar';
+import { LoadingSpinnerComponent } from '../../components/loading-spinner/loading-spinner';
 import { GemClientesTicket, validateTicketAttachments, TICKET_ATTACHMENT_ACCEPT } from '../../core/models/gem-clientes-ticket.model';
 import { GemClientesTicketFilters, GemClientesTicketsService } from '../../core/services/gem-clientes-tickets.service';
 import { DrawerTicketComponent } from './drawer-ticket/drawer-ticket.component';
@@ -23,16 +25,20 @@ import { DrawerTicketComponent } from './drawer-ticket/drawer-ticket.component';
     DrawerTicketComponent,
     FormsModule,
     InputTextModule,
+    LoadingSpinnerComponent,
     TableModule,
     TagModule,
     ToolbarModule,
     UiCard,
   ],
   templateUrl: './tickets.component.html',
+  styleUrl: './tickets.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TicketsComponent implements OnInit {
   private readonly ticketsService = inject(GemClientesTicketsService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
   @ViewChild('dt') table?: Table;
 
@@ -53,12 +59,30 @@ export class TicketsComponent implements OnInit {
   readonly newFiles = signal<File[]>([]);
   searchValue = signal('');
   statusFilter = signal('');
+  priorityFilter = signal('');
+  typeFilter = signal('');
+  newType = signal('');
   createdFrom = signal('');
   createdTo = signal('');
   readonly attachmentAccept = TICKET_ATTACHMENT_ACCEPT;
 
   ngOnInit(): void {
     this.loadTickets();
+    const token = this.route.snapshot.queryParamMap.get('sharedTicketToken');
+    if (token) this.openSharedTicket(token);
+  }
+
+  private openSharedTicket(token: string): void {
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { sharedTicketToken: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+    this.ticketsService.resolveSharedTicket(token).subscribe({
+      next: ({ id }) => this.selectedTicketId.set(id),
+      error: () => this.error.set('No pudimos abrir el ticket compartido.'),
+    });
   }
 
   loadTickets(): void {
@@ -83,6 +107,8 @@ export class TicketsComponent implements OnInit {
     return {
       ...(this.searchValue().trim() ? { search: this.searchValue().trim() } : {}),
       ...(this.statusFilter() ? { estado: this.statusFilter() } : {}),
+      ...(this.priorityFilter() ? { prioridad: this.priorityFilter() } : {}),
+      ...(this.typeFilter() ? { tipo: this.typeFilter() } : {}),
       ...(this.createdFrom() ? { createdFrom: this.createdFrom() } : {}),
       ...(this.createdTo() ? { createdTo: this.createdTo() } : {}),
     };
@@ -116,6 +142,7 @@ export class TicketsComponent implements OnInit {
     this.newSubject.set('');
     this.newDescription.set('');
     this.newExternalReference.set('');
+    this.newType.set('');
     this.newFiles.set([]);
     this.createError.set(null);
     this.createDialogVisible.set(true);
@@ -142,6 +169,7 @@ export class TicketsComponent implements OnInit {
       description,
       ...(externalReference ? { externalReference } : {}),
       ...(this.newFiles().length ? { files: this.newFiles() } : {}),
+      ...(this.newType() ? { type: this.newType() as Exclude<GemClientesTicket['type'], null> } : {}),
     }).pipe(
       finalize(() => {
         this.createLoading.set(false)
@@ -214,6 +242,7 @@ export class TicketsComponent implements OnInit {
     table?.clear();
     this.searchValue.set('');
     this.statusFilter.set('');
+    this.priorityFilter.set(''); this.typeFilter.set('');
     this.createdFrom.set('');
     this.createdTo.set('');
     this.filterError.set(null);
