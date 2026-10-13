@@ -119,11 +119,17 @@
   </div>
 </div>
 
-<p-dialog header="Nuevo ticket" [modal]="true" [visible]="createDialogVisible()"
-  (visibleChange)="createDialogVisible.set($event)" [style]="{ width: 'min(36rem, calc(100vw - 2rem))' }">
+ <p-dialog header="Nuevo ticket" [modal]="true" [visible]="createDialogVisible()"
+   (visibleChange)="onCreateDialogVisibleChange($event)" [style]="{ width: 'min(36rem, calc(100vw - 2rem))' }">
   <div class="mb-3">
     <label class="form-label" for="ticket-type-create">Tipo <span class="text-muted">(opcional)</span></label>
     <select id="ticket-type-create" class="form-select" [value]="newType()" (change)="newType.set($any($event.target).value)"><option value="">Sin clasificar</option><option value="CONSULTA">Consultas</option><option value="ERROR_INCIDENTE">Error / Incidente</option><option value="REQUERIMIENTO_MEJORA">Requerimiento / Mejora</option></select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label" for="ticket-priority-create">Prioridad</label>
+    <select id="ticket-priority-create" class="form-select" [value]="newPriority()" (change)="newPriority.set($any($event.target).value)">
+      <option value="CRITICA">Crítica</option><option value="ALTA">Alta</option><option value="MEDIA">Media</option><option value="BAJA">Baja</option>
+    </select>
   </div>
   <div class="mb-3">
     <label class="form-label" for="ticket-subject">Asunto</label>
@@ -132,7 +138,7 @@
   </div>
   <div class="mb-3">
     <label class="form-label" for="ticket-files">Adjuntos <span class="text-muted">(opcional)</span></label>
-     <input id="ticket-files" class="form-control" type="file" multiple [accept]="attachmentAccept" (change)="onNewFiles($event)" aria-describedby="ticket-files-help" />
+      <input #ticketFilesInput id="ticket-files" class="form-control" type="file" multiple [accept]="attachmentAccept" (change)="onNewFiles($event)" aria-describedby="ticket-files-help" />
      <small id="ticket-files-help" class="form-text text-muted">Hasta 10 archivos, 25 MB por archivo y 50 MB en total.</small>
   </div>
   <div class="mb-3">
@@ -149,7 +155,7 @@
   <p class="text-danger" role="alert">{{ createErrorMessage }}</p>
   }
   <ng-template #footer>
-    <button class="btn btn-light" type="button" (click)="createDialogVisible.set(false)">Cancelar</button>
+    <button class="btn btn-light" type="button" (click)="onCreateDialogVisibleChange(false)">Cancelar</button>
     <button class="btn btn-primary" type="button" [disabled]="createLoading()" (click)="createTicket()">
       {{ createLoading() ? 'Creando...' : 'Crear ticket' }}
     </button>

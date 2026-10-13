@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { UiCard } from '../../components/ui-card';
@@ -14,6 +14,8 @@ import { LoadingSpinnerComponent } from '../../components/loading-spinner/loadin
 import { GemClientesTicket, validateTicketAttachments, TICKET_ATTACHMENT_ACCEPT } from '../../core/models/gem-clientes-ticket.model';
 import { GemClientesTicketFilters, GemClientesTicketsService } from '../../core/services/gem-clientes-tickets.service';
 import { DrawerTicketComponent } from './drawer-ticket/drawer-ticket.component';
+import { SseService } from '../../core/services/sse.service';
+import { GemClientesIdentityService } from '../../core/services/gem-clientes-identity.service';
 
 @Component({
   selector: 'app-tickets',
@@ -40,7 +42,10 @@ export class TicketsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private readonly sse = inject(SseService);
+  private readonly identity = inject(GemClientesIdentityService);
   @ViewChild('dt') table?: Table;
+  @ViewChild('ticketFilesInput') ticketFilesInput?: ElementRef<HTMLInputElement>;
 
   readonly tickets = signal<GemClientesTicket[]>([]);
   readonly total = signal(0);
@@ -62,9 +67,19 @@ export class TicketsComponent implements OnInit {
   priorityFilter = signal('');
   typeFilter = signal('');
   newType = signal('');
+  newPriority = signal<GemClientesTicket['priority']>('MEDIA');
   createdFrom = signal('');
   createdTo = signal('');
   readonly attachmentAccept = TICKET_ATTACHMENT_ACCEPT;
+  private lastTicketMutationKey = '';
+  private readonly ticketMutationEffect = effect(() => {
+    const event = this.sse.ticketMutations()[0];
+    if (!event || (event.clienteId !== undefined && event.clienteId !== this.identity.identity()?.clienteId)) return;
+    const mutationKey = `${event.ticketId}:${event.operation}:${event.timestamp}`;
+    if (mutationKey === this.lastTicketMutationKey) return;
+    this.lastTicketMutationKey = mutationKey;
+    if (event.operation === 'CREATED' || this.tickets().some((ticket) => ticket.id === event.ticketId)) this.loadTickets();
+  });
 
   ngOnInit(): void {
     this.loadTickets();
@@ -91,6 +106,9 @@ export class TicketsComponent implements OnInit {
     this.ticketsService.listTickets({ ...this.filters(), page: this.page, limit: this.limit }).pipe(
       finalize(() => {
         this.loading.set(false);
+        // Abrir SSE antes de finalizar la carga puede ocupar la única conexión
+        // HTTP disponible detrás de algunos proxies HTTP/1.1.
+        this.sse.connect();
         this.cdr.detectChanges();
       }),
     ).subscribe({
@@ -143,7 +161,9 @@ export class TicketsComponent implements OnInit {
     this.newDescription.set('');
     this.newExternalReference.set('');
     this.newType.set('');
+    this.newPriority.set('MEDIA');
     this.newFiles.set([]);
+    this.clearFileInput();
     this.createError.set(null);
     this.createDialogVisible.set(true);
   }
@@ -170,12 +190,15 @@ export class TicketsComponent implements OnInit {
       ...(externalReference ? { externalReference } : {}),
       ...(this.newFiles().length ? { files: this.newFiles() } : {}),
       ...(this.newType() ? { type: this.newType() as Exclude<GemClientesTicket['type'], null> } : {}),
+      priority: this.newPriority(),
     }).pipe(
       finalize(() => {
         this.createLoading.set(false)
       }),
     ).subscribe({
       next: () => {
+        this.newFiles.set([]);
+        this.clearFileInput();
         this.createDialogVisible.set(false);
         this.page = 1;
         if (this.table) this.table.first = 0;
@@ -186,10 +209,38 @@ export class TicketsComponent implements OnInit {
   }
 
   onNewFiles(event: Event): void {
-    const files = Array.from((event.target as HTMLInputElement).files ?? []);
+    const input = event.target as HTMLInputElement;
+    const selectedFiles = Array.from(input.files ?? []);
+    const existingFiles = this.newFiles();
+    const files = [...existingFiles];
+    const knownFiles = new Set(existingFiles.map((file) => this.fileKey(file)));
+    for (const file of selectedFiles) {
+      if (!knownFiles.has(this.fileKey(file))) {
+        files.push(file);
+        knownFiles.add(this.fileKey(file));
+      }
+    }
     const error = validateTicketAttachments(files);
     this.createError.set(error);
     if (!error) this.newFiles.set(files);
+    // Permite volver a elegir el mismo archivo y evita que el DOM conserve la selección.
+    input.value = '';
+  }
+
+  onCreateDialogVisibleChange(visible: boolean): void {
+    this.createDialogVisible.set(visible);
+    if (!visible) {
+      this.newFiles.set([]);
+      this.clearFileInput();
+    }
+  }
+
+  private clearFileInput(): void {
+    if (this.ticketFilesInput) this.ticketFilesInput.nativeElement.value = '';
+  }
+
+  private fileKey(file: File): string {
+    return `${file.name}\u0000${file.size}\u0000${file.lastModified}`;
   }
 
   descriptionExcerpt(description: string): string {

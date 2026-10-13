@@ -78,4 +78,5 @@ export interface CreateGemClientesTicket {
   externalReference?: string;
   files?: File[];
   type?: 'CONSULTA' | 'ERROR_INCIDENTE' | 'REQUERIMIENTO_MEJORA';
+  priority?: 'CRITICA' | 'ALTA' | 'MEDIA' | 'BAJA';
 }
