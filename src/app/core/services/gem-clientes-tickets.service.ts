@@ -41,6 +41,7 @@ export class GemClientesTicketsService {
     body.append('descripcion', ticket.description);
     if (ticket.externalReference !== undefined) body.append('referenciaExterna', ticket.externalReference);
     if (ticket.type) body.append('tipo', ticket.type);
+    if (ticket.priority) body.append('prioridad', ticket.priority);
     for (const file of ticket.files ?? []) body.append('archivos', file, file.name);
     return this.http.post<GemClientesTicket>(
       `${environment.apiBaseUrl}/v1/gem-clientes/tickets`,

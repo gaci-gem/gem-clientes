@@ -85,6 +85,24 @@ describe('GemClientesTicketsService', () => {
     request.flush({});
   });
 
+  it('envía todos los adjuntos como entradas repetidas de archivos', () => {
+    const files = [
+      new File(['one'], 'one.txt', { type: 'text/plain' }),
+      new File(['two'], 'two.txt', { type: 'text/plain' }),
+    ];
+    service.createTicket({ subject: 'Solicitud', description: 'Detalle', files }).subscribe();
+    const request = http.expectOne(`${environment.apiBaseUrl}/v1/gem-clientes/tickets`);
+    expect((request.request.body as FormData).getAll('archivos')).toEqual(files);
+    request.flush({});
+  });
+
+  it('sends the selected priority in the ticket FormData', () => {
+    service.createTicket({ subject: 'Solicitud', description: 'Detalle', priority: 'ALTA' }).subscribe();
+    const request = http.expectOne(`${environment.apiBaseUrl}/v1/gem-clientes/tickets`);
+    expect((request.request.body as FormData).get('prioridad')).toBe('ALTA');
+    request.flush({});
+  });
+
   it('adds a comment without sending tenant identifiers', () => {
     service.addComment(42, 'More information').subscribe();
     const request = http.expectOne(`${environment.apiBaseUrl}/v1/gem-clientes/tickets/42/comments`);
