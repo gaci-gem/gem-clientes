@@ -1,20 +1,39 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { GemClientesTicketsService } from '../../core/services/gem-clientes-tickets.service';
+import { SseService } from '../../core/services/sse.service';
 import { TicketsComponent } from './tickets.component';
 import { DrawerTicketComponent } from './drawer-ticket/drawer-ticket.component';
 
 describe('TicketsComponent', () => {
   let fixture: ComponentFixture<TicketsComponent>;
   let service: jasmine.SpyObj<GemClientesTicketsService> & { listTickets: jasmine.Spy };
+  let sse: jasmine.SpyObj<SseService>;
 
   beforeEach(() => {
     service = jasmine.createSpyObj('GemClientesTicketsService', ['listTickets', 'getTicket', 'createTicket', 'addComment', 'updateExternalReference']) as typeof service;
+    sse = jasmine.createSpyObj('SseService', ['connect', 'disconnect']);
     TestBed.configureTestingModule({
       imports: [TicketsComponent],
-      providers: [{ provide: GemClientesTicketsService, useValue: service }],
+      providers: [
+        { provide: GemClientesTicketsService, useValue: service },
+        { provide: SseService, useValue: sse },
+      ],
     });
+  });
+
+  it('conecta SSE después de completar la carga inicial de tickets', () => {
+    const ticketsRequest = new Subject<never>();
+    service.listTickets.and.returnValue(ticketsRequest.asObservable());
+    fixture = TestBed.createComponent(TicketsComponent);
+    fixture.detectChanges();
+
+    expect(sse.connect).not.toHaveBeenCalled();
+
+    ticketsRequest.complete();
+
+    expect(sse.connect).toHaveBeenCalledOnceWith();
   });
 
   it('renders a populated ticket list', () => {
@@ -84,6 +103,7 @@ describe('TicketsComponent', () => {
     expect(service.createTicket).toHaveBeenCalledOnceWith({
       subject: 'New request',
       description: 'Please investigate.',
+      priority: 'MEDIA',
     });
     expect(service.listTickets).toHaveBeenCalledTimes(2);
   });
@@ -103,7 +123,36 @@ describe('TicketsComponent', () => {
       subject: 'New request',
       description: 'Please investigate.',
       externalReference: 'CASE-1',
+      priority: 'MEDIA',
     });
+  });
+
+  it('acumula selecciones sucesivas, evita duplicados y valida el acumulado', () => {
+    service.listTickets.and.returnValue(of([]));
+    fixture = TestBed.createComponent(TicketsComponent);
+    fixture.detectChanges();
+    const input = fixture.nativeElement.querySelector('#ticket-files') as HTMLInputElement;
+    const first = new File(['a'], 'a.txt', { type: 'text/plain', lastModified: 1 });
+    const duplicate = new File(['a'], 'a.txt', { type: 'text/plain', lastModified: 1 });
+    const second = new File(['b'], 'b.txt', { type: 'text/plain', lastModified: 2 });
+    Object.defineProperty(input, 'files', { value: [first], configurable: true });
+    input.dispatchEvent(new Event('change'));
+    Object.defineProperty(input, 'files', { value: [duplicate, second], configurable: true });
+    input.dispatchEvent(new Event('change'));
+    expect(fixture.componentInstance.newFiles()).toEqual([first, second]);
+    expect(fixture.componentInstance.createError()).toBeNull();
+    expect(input.value).toBe('');
+  });
+
+  it('limpia los archivos al cerrar y al abrir un nuevo ticket', () => {
+    service.listTickets.and.returnValue(of([]));
+    fixture = TestBed.createComponent(TicketsComponent);
+    fixture.detectChanges();
+    fixture.componentInstance.newFiles.set([new File(['a'], 'a.txt', { type: 'text/plain' })]);
+    fixture.componentInstance.onCreateDialogVisibleChange(false);
+    expect(fixture.componentInstance.newFiles()).toEqual([]);
+    fixture.componentInstance.openCreateDialog();
+    expect(fixture.componentInstance.newFiles()).toEqual([]);
   });
 
   it('keeps comment capability in the detail drawer', () => {

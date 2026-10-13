@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, Output, ViewChild, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, effect, ElementRef, EventEmitter, Input, Output, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
@@ -11,6 +11,7 @@ import { LoadingSpinnerComponent } from '../../../components/loading-spinner/loa
 import { GemClientesTicketAttachment, GemClientesTicketComment, GemClientesTicketDetail, validateTicketAttachments, TICKET_ATTACHMENT_ACCEPT } from '../../../core/models/gem-clientes-ticket.model';
 import { GemClientesTicketsService } from '../../../core/services/gem-clientes-tickets.service';
 import { environment } from '../../../../environments/environment';
+import { SseService } from '../../../core/services/sse.service';
 
 interface AttachmentPresentation {
   icon: string;
@@ -67,6 +68,7 @@ export class DrawerTicketComponent {
   readonly apiBaseUrl = environment.apiBaseUrl;
   private readonly service = inject(GemClientesTicketsService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly sse = inject(SseService);
 
   @Input() visible = false;
   @Input() ticketId: number | null = null;
@@ -87,8 +89,23 @@ export class DrawerTicketComponent {
   externalReferenceError: string | null = null;
   prioritySaving = false; typeSaving = false;
   private loadedKey: number | null = null;
+  private lastMutationKey: string | null = null;
   readonly attachmentAccept = TICKET_ATTACHMENT_ACCEPT;
   @ViewChild('commentFileInput') private commentFileInput?: ElementRef<HTMLInputElement>;
+
+  constructor() {
+    effect(() => {
+      const mutation = this.sse.ticketMutations()[0];
+      if (!mutation || !this.visible || mutation.ticketId !== this.ticketId) return;
+      const key = `${mutation.ticketId}:${mutation.timestamp}:${mutation.operation}`;
+      if (key === this.lastMutationKey) return;
+      this.lastMutationKey = key;
+      // No se reemplaza el detalle mientras el usuario edita referencia o comentario.
+      if (this.externalReferenceEditing || this.externalReferenceLoading || this.commentDraft.trim()) return;
+      this.loadedKey = null;
+      this.ngOnChanges();
+    });
+  }
 
   ngOnChanges(): void {
     if (!this.visible || this.ticketId === null || this.loadedKey === this.ticketId) return;

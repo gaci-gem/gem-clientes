@@ -9,6 +9,7 @@ import { GemClientesIdentityService } from "../../core/services/gem-clientes-ide
 import { DialogService } from 'primeng/dynamicdialog';
 import { ChangelogModalComponent } from '../../views/changelog/changelog-modal';
 import { VersionService } from '../../core/services/version';
+import { SseService } from '../../core/services/sse.service';
 
 
 @Component({
@@ -29,12 +30,13 @@ import { VersionService } from '../../core/services/version';
 })
 export class VerticalLayout implements OnInit, OnDestroy {
 
-  constructor(public layout: LayoutStoreService, private identity: GemClientesIdentityService, private versionService: VersionService, private dialogService: DialogService) { }
+  constructor(public layout: LayoutStoreService, private identity: GemClientesIdentityService, private versionService: VersionService, private dialogService: DialogService, private sse: SseService) { }
   resizeSubscription!: Subscription
   private changelogTimer?: ReturnType<typeof setTimeout>
 
   ngOnInit() {
     if (!this.identity.identity()) this.identity.load().subscribe();
+    this.sse.connect();
     this.onResize()
     this.checkAndShowChangelog()
 
