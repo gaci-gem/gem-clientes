@@ -44,14 +44,14 @@
               </a>
             }
           } @if (item.event) {
-            <a (click)="handleEvent(item.event)" class="dropdown-item" [class]="item.class">
+            <button type="button" (click)="handleEvent(item.event)" class="dropdown-item" [class]="item.class">
               <ng-icon
                 [name]="item.icon"
                 size="17"
                 class="align-middle d-inline-flex align-items-center me-2"
               />
-              <span class="align-middle" [innerHTML]="item.label"></span>
-            </a>
+                <span class="align-middle" [innerHTML]="item.label"></span>
+            </button>
           }
         }
       </div>

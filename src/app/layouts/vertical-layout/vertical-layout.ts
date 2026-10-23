@@ -8,7 +8,7 @@ import { Footer } from "../components/footer/footer";
 import { GemClientesIdentityService } from "../../core/services/gem-clientes-identity.service";
 import { DialogService } from 'primeng/dynamicdialog';
 import { ChangelogModalComponent } from '../../views/changelog/changelog-modal';
-import { VersionService } from '../../core/services/version';
+import { VersionService, shouldShowChangelog } from '../../core/services/version';
 import { SseService } from '../../core/services/sse.service';
 
 
@@ -48,7 +48,7 @@ export class VerticalLayout implements OnInit, OnDestroy {
   private checkAndShowChangelog(): void {
     this.versionService.getVersion().subscribe({
       next: ({ version }) => {
-        if (!version || version === localStorage.getItem('lastSeenVersion')) return;
+        if (!shouldShowChangelog(version, localStorage.getItem('lastSeenVersion'))) return;
         this.changelogTimer = setTimeout(() => this.dialogService.open(ChangelogModalComponent, {
           header: 'Novedades', width: '600px', modal: true, dismissableMask: true, styleClass: 'changelog-dialog'
         }), 1000);

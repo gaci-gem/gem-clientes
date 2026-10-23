@@ -19,7 +19,7 @@ export const userDropdownItems: UserDropdownItemType[] = [
   {
     label: 'Cambiar contraseña',
     icon: 'tablerUserCircle',
-    url: '/cuenta',
+    event: 'change-password',
   },
   {
     isDivider: true,
