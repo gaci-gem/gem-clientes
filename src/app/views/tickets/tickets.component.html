@@ -139,8 +139,25 @@
   <div class="mb-3">
     <label class="form-label" for="ticket-files">Adjuntos <span class="text-muted">(opcional)</span></label>
       <input #ticketFilesInput id="ticket-files" class="form-control" type="file" multiple [accept]="attachmentAccept" (change)="onNewFiles($event)" aria-describedby="ticket-files-help" />
-     <small id="ticket-files-help" class="form-text text-muted">Hasta 10 archivos, 25 MB por archivo y 50 MB en total.</small>
-  </div>
+      <small id="ticket-files-help" class="form-text text-muted">Hasta 10 archivos, 25 MB por archivo y 50 MB en total.</small>
+      @if (newFiles().length) {
+        <div class="alert alert-success mt-2 mb-0" role="status" aria-live="polite">
+            <strong>Archivos cargados:</strong>
+            <ul class="mb-0 ps-3">
+              @for (file of newFiles(); track file.name + file.lastModified) {
+               <li class="d-flex align-items-center justify-content-between gap-2">
+                 <span class="text-break">{{ file.name }} <span class="visually-hidden">(cargado)</span></span>
+                 <button class="btn btn-link btn-sm p-0 flex-shrink-0 text-danger" type="button"
+                   [attr.aria-label]="'Eliminar ' + file.name" [title]="'Eliminar ' + file.name"
+                   (click)="removeNewFile(file)">
+                   <i class="pi pi-trash" aria-hidden="true"></i>
+                 </button>
+               </li>
+              }
+          </ul>
+        </div>
+      }
+   </div>
   <div class="mb-3">
     <label class="form-label" for="ticket-description">Descripción</label>
     <textarea id="ticket-description" class="form-control w-100" rows="6" [ngModel]="newDescription()"

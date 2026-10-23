@@ -144,6 +144,48 @@ describe('TicketsComponent', () => {
     expect(input.value).toBe('');
   });
 
+  it('confirma visualmente los archivos cargados sin crear el ticket', () => {
+    service.listTickets.and.returnValue(of([]));
+    fixture = TestBed.createComponent(TicketsComponent);
+    fixture.detectChanges();
+    const input = fixture.nativeElement.querySelector('#ticket-files') as HTMLInputElement;
+    const first = new File(['a'], 'evidencia.txt', { type: 'text/plain', lastModified: 1 });
+    const second = new File(['b'], 'captura.png', { type: 'image/png', lastModified: 2 });
+
+    Object.defineProperty(input, 'files', { value: [first, second], configurable: true });
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const confirmation = fixture.nativeElement.querySelector('.alert.alert-success[role="status"]') as HTMLElement;
+    expect(confirmation).not.toBeNull();
+    expect(confirmation.textContent).toContain('Archivos cargados:');
+    expect(confirmation.textContent).toContain('evidencia.txt');
+    expect(confirmation.textContent).toContain('captura.png');
+    expect(service.createTicket).not.toHaveBeenCalled();
+  });
+
+  it('elimina un archivo seleccionado y permite volver a seleccionarlo', () => {
+    service.listTickets.and.returnValue(of([]));
+    fixture = TestBed.createComponent(TicketsComponent);
+    fixture.detectChanges();
+    const input = fixture.nativeElement.querySelector('#ticket-files') as HTMLInputElement;
+    const first = new File(['a'], 'evidencia.txt', { type: 'text/plain', lastModified: 1 });
+    const second = new File(['b'], 'captura.png', { type: 'image/png', lastModified: 2 });
+
+    Object.defineProperty(input, 'files', { value: [first, second], configurable: true });
+    input.dispatchEvent(new Event('change'));
+    fixture.detectChanges();
+
+    const removeButton = fixture.nativeElement.querySelector('button[aria-label="Eliminar evidencia.txt"]') as HTMLButtonElement;
+    expect(removeButton).not.toBeNull();
+    removeButton.click();
+    expect(fixture.componentInstance.newFiles()).toEqual([second]);
+
+    Object.defineProperty(input, 'files', { value: [first], configurable: true });
+    input.dispatchEvent(new Event('change'));
+    expect(fixture.componentInstance.newFiles()).toEqual([second, first]);
+  });
+
   it('limpia los archivos al cerrar y al abrir un nuevo ticket', () => {
     service.listTickets.and.returnValue(of([]));
     fixture = TestBed.createComponent(TicketsComponent);

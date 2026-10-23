@@ -227,6 +227,12 @@ export class TicketsComponent implements OnInit {
     input.value = '';
   }
 
+  removeNewFile(fileToRemove: File): void {
+    this.newFiles.update((files) => files.filter((file) => this.fileKey(file) !== this.fileKey(fileToRemove)));
+    this.createError.set(null);
+    this.clearFileInput();
+  }
+
   onCreateDialogVisibleChange(visible: boolean): void {
     this.createDialogVisible.set(visible);
     if (!visible) {

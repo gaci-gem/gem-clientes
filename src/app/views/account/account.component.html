@@ -1,20 +1,11 @@
-<div class="container-fluid">
-  <div class="row justify-content-center">
-    <div class="col-12 col-lg-7 mt-3">
-      <div class="card">
-        <div class="card-body">
-          <h1 class="h4">Cambiar contraseña</h1>
-          <p class="text-muted">Usá tu contraseña actual para definir una nueva.</p>
+<div class="account-password-form">
+  <p class="text-muted">Usá tu contraseña actual para definir una nueva.</p>
           @if (successMessage) { <p class="alert alert-success" role="status">{{ successMessage }}</p> }
           @if (errorMessage) { <p class="alert alert-danger" role="alert">{{ errorMessage }}</p> }
           <form [formGroup]="passwordForm" (ngSubmit)="submit()">
-            <div class="mb-3"><label class="form-label" for="currentPassword">Contraseña actual</label><input id="currentPassword" class="form-control" type="password" formControlName="currentPassword" autocomplete="current-password"></div>
-            <div class="mb-3"><label class="form-label" for="newPassword">Nueva contraseña</label><input id="newPassword" class="form-control" type="password" formControlName="newPassword" autocomplete="new-password"><small class="text-muted">Mínimo 8 caracteres.</small></div>
-            <div class="mb-3"><label class="form-label" for="confirmation">Confirmar nueva contraseña</label><input id="confirmation" class="form-control" type="password" formControlName="confirmation" autocomplete="new-password"></div>
+            <div class="mb-3"><label class="form-label" for="currentPassword">Contraseña actual</label><div class="input-group"><input id="currentPassword" class="form-control" [class.is-invalid]="shouldShowError('currentPassword')" [type]="showPassword.currentPassword ? 'text' : 'password'" formControlName="currentPassword" autocomplete="current-password" aria-describedby="currentPasswordError"><button class="btn btn-outline-secondary" type="button" (click)="togglePassword('currentPassword')" [attr.aria-label]="showPassword.currentPassword ? 'Ocultar contraseña actual' : 'Mostrar contraseña actual'" [attr.title]="showPassword.currentPassword ? 'Ocultar contraseña actual' : 'Mostrar contraseña actual'"><i [class]="showPassword.currentPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" aria-hidden="true"></i></button></div>@if (shouldShowError('currentPassword')) { <div id="currentPasswordError" class="invalid-feedback d-block">La contraseña actual es obligatoria.</div> }</div>
+            <div class="mb-3"><label class="form-label" for="newPassword">Nueva contraseña</label><div class="input-group"><input id="newPassword" class="form-control" [class.is-invalid]="shouldShowError('newPassword')" [type]="showPassword.newPassword ? 'text' : 'password'" formControlName="newPassword" autocomplete="new-password" aria-describedby="newPasswordHelp newPasswordError"><button class="btn btn-outline-secondary" type="button" (click)="togglePassword('newPassword')" [attr.aria-label]="showPassword.newPassword ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'" [attr.title]="showPassword.newPassword ? 'Ocultar nueva contraseña' : 'Mostrar nueva contraseña'"><i [class]="showPassword.newPassword ? 'pi pi-eye-slash' : 'pi pi-eye'" aria-hidden="true"></i></button></div><small id="newPasswordHelp" class="text-muted">Mínimo 8 caracteres, con al menos una letra y un número.</small>@if (shouldShowError('newPassword')) { <div id="newPasswordError" class="invalid-feedback d-block">La nueva contraseña debe tener mínimo 8 caracteres y al menos una letra y un número.</div> }</div>
+            <div class="mb-3"><label class="form-label" for="confirmation">Confirmar nueva contraseña</label><div class="input-group"><input id="confirmation" class="form-control" [class.is-invalid]="shouldShowError('confirmation') || shouldShowConfirmationMismatch()" [type]="showPassword.confirmation ? 'text' : 'password'" formControlName="confirmation" autocomplete="new-password" aria-describedby="confirmationError confirmationMismatchError"><button class="btn btn-outline-secondary" type="button" (click)="togglePassword('confirmation')" [attr.aria-label]="showPassword.confirmation ? 'Ocultar confirmación de contraseña' : 'Mostrar confirmación de contraseña'" [attr.title]="showPassword.confirmation ? 'Ocultar confirmación de contraseña' : 'Mostrar confirmación de contraseña'"><i [class]="showPassword.confirmation ? 'pi pi-eye-slash' : 'pi pi-eye'" aria-hidden="true"></i></button></div>@if (shouldShowError('confirmation')) { <div id="confirmationError" class="invalid-feedback d-block">La confirmación de contraseña es obligatoria.</div> } @if (shouldShowConfirmationMismatch()) { <div id="confirmationMismatchError" class="invalid-feedback d-block">La confirmación no coincide con la nueva contraseña.</div> }</div>
             <button class="btn btn-primary" type="submit" [disabled]="isSubmitting">{{ isSubmitting ? 'Actualizando...' : 'Actualizar contraseña' }}</button>
           </form>
-        </div>
-      </div>
-    </div>
-  </div>
 </div>
