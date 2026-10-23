@@ -9,6 +9,8 @@ import {
 import { userDropdownItems, UserDropdownItemType } from '../../../data'
 import { Router, RouterLink } from '@angular/router'
 import { NgIcon } from '@ng-icons/core'
+import { DialogService } from 'primeng/dynamicdialog';
+import { AccountComponent } from '../../../../../views/account/account.component';
 // import { AuthService } from '@core/services/auth'
 // import { UserStorageService } from '@core/services/user-storage'
 // import { Adicional, UsuarioCompleto } from '@core/interfaces/usuario'
@@ -26,6 +28,7 @@ import { NgIcon } from '@ng-icons/core'
     RouterLink,
     NgIcon,
   ],
+  providers: [DialogService],
   templateUrl: './user-profile.html',
 })
 export class UserProfile implements OnInit, AfterViewInit {
@@ -35,6 +38,7 @@ export class UserProfile implements OnInit, AfterViewInit {
   // private usuarioService = inject(UsuarioService);
   // private userStorageService = inject(UserStorageService);
   private cdr = inject(ChangeDetectorRef);
+  private readonly dialogService = inject(DialogService);
   // private avatarSyncService = inject(AvatarSyncService);
 
   menuItems: UserDropdownItemType[] = []
@@ -87,12 +91,30 @@ export class UserProfile implements OnInit, AfterViewInit {
     if (!event) return;
 
     switch (event) {
+      case 'change-password':
+        this.openChangePassword();
+        break;
       case 'logout':
         this.logout();
         break;
       default:
         console.warn('Evento no manejado:', event);
     }
+  }
+
+  openChangePassword(): void {
+    this.dialogService.open(AccountComponent, {
+      header: 'Cambiar contraseña',
+      width: 'min(560px, 95vw)',
+      breakpoints: {
+        '640px': '95vw',
+      },
+      modal: true,
+      dismissableMask: true,
+      closeOnEscape: true,
+      draggable: false,
+      resizable: false,
+    });
   }
 
   logout() {
