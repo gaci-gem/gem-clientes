@@ -15,6 +15,13 @@ export interface ChangelogChange {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.3.2',
+    date: '2026-10-28',
+    changes: [
+      { type: 'fix', text: 'Corregimos la visualización de correos originales y adjuntos EML en los tickets.' },
+    ],
+  },
+  {
     version: '0.3.1',
     date: '2026-10-23',
     changes: [
