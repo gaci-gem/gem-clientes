@@ -1,17 +1,27 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subject, of, throwError } from 'rxjs';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { MessageService } from 'primeng/api';
 import { GemClientesPasswordService } from '../../core/services/gem-clientes-password.service';
 import { AccountComponent } from './account.component';
 
 describe('AccountComponent', () => {
   let fixture: ComponentFixture<AccountComponent>;
   let service: jasmine.SpyObj<GemClientesPasswordService>;
+  let dialogRef: jasmine.SpyObj<DynamicDialogRef>;
+  let messageService: jasmine.SpyObj<MessageService>;
 
   beforeEach(() => {
     service = jasmine.createSpyObj('GemClientesPasswordService', ['changePassword']);
+    dialogRef = jasmine.createSpyObj('DynamicDialogRef', ['close']);
+    messageService = jasmine.createSpyObj('MessageService', ['add']);
     TestBed.configureTestingModule({
       imports: [AccountComponent],
-      providers: [{ provide: GemClientesPasswordService, useValue: service }],
+      providers: [
+        { provide: GemClientesPasswordService, useValue: service },
+        { provide: DynamicDialogRef, useValue: dialogRef },
+        { provide: MessageService, useValue: messageService },
+      ],
     });
     fixture = TestBed.createComponent(AccountComponent);
   });
@@ -31,7 +41,7 @@ describe('AccountComponent', () => {
     fixture.detectChanges();
 
     expect(service.changePassword).not.toHaveBeenCalled();
-    expect(component['errorMessage']).toBe('Revisá los campos indicados antes de actualizar tu contraseña.');
+    expect(messageService.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail: 'Revisá los campos indicados antes de actualizar tu contraseña.' }));
     expect(fixture.nativeElement.textContent).toContain('La nueva contraseña debe tener mínimo 8 caracteres y al menos una letra y un número.');
     expect(fixture.nativeElement.querySelector('#newPasswordError')?.getAttribute('id')).toBe('newPasswordError');
   });
@@ -43,7 +53,7 @@ describe('AccountComponent', () => {
     component['submit']();
 
     expect(service.changePassword).not.toHaveBeenCalled();
-    expect(component['errorMessage']).toBe('La nueva contraseña debe ser distinta de la actual.');
+    expect(messageService.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail: 'La nueva contraseña debe ser distinta de la actual.' }));
   });
 
   it('muestra el mismatch debajo de la confirmación y no llama al servicio', () => {
@@ -54,7 +64,7 @@ describe('AccountComponent', () => {
     fixture.detectChanges();
 
     expect(service.changePassword).not.toHaveBeenCalled();
-    expect(component['errorMessage']).toBe('Las contraseñas nuevas no coinciden.');
+    expect(messageService.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail: 'Las contraseñas nuevas no coinciden.' }));
     expect(fixture.nativeElement.querySelector('#confirmationMismatchError')?.textContent).toContain('no coincide');
     expect(fixture.nativeElement.querySelector('#confirmation')?.getAttribute('aria-describedby')).toContain('confirmationMismatchError');
   });
@@ -89,7 +99,7 @@ describe('AccountComponent', () => {
     response.error({ status: 400, error: { message: 'La contraseña no cumple la política.' } });
 
     expect(component['isSubmitting']).toBeFalse();
-    expect(component['errorMessage']).toBe('La contraseña no cumple la política.');
+    expect(messageService.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail: 'La contraseña no cumple la política.' }));
   });
 
   it('muestra un mensaje específico para 401 y libera el estado de envío', () => {
@@ -100,7 +110,8 @@ describe('AccountComponent', () => {
     component['submit']();
 
     expect(component['isSubmitting']).toBeFalse();
-    expect(component['errorMessage']).toBe('La contraseña actual no es válida.');
+    expect(messageService.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error', detail: 'La contraseña actual no es válida.' }));
+    expect(dialogRef.close).not.toHaveBeenCalled();
   });
 
   it('resetea el formulario y libera el estado al completar correctamente', () => {
@@ -112,6 +123,7 @@ describe('AccountComponent', () => {
 
     expect(component['isSubmitting']).toBeFalse();
     expect(component['passwordForm'].getRawValue()).toEqual({ currentPassword: '', newPassword: '', confirmation: '' });
-    expect(component['successMessage']).toBe('Tu contraseña se actualizó correctamente.');
+    expect(messageService.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'success', detail: 'Tu contraseña se actualizó correctamente.' }));
+    expect(dialogRef.close).toHaveBeenCalled();
   });
 });

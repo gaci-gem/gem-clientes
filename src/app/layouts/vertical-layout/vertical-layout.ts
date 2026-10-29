@@ -10,6 +10,7 @@ import { DialogService } from 'primeng/dynamicdialog';
 import { ChangelogModalComponent } from '../../views/changelog/changelog-modal';
 import { VersionService, shouldShowChangelog } from '../../core/services/version';
 import { SseService } from '../../core/services/sse.service';
+import { ToastModule } from 'primeng/toast';
 
 
 @Component({
@@ -19,6 +20,7 @@ import { SseService } from '../../core/services/sse.service';
     SidenavComponent,
     Topbar,
     Footer,
+    ToastModule,
   ],
   templateUrl: './vertical-layout.html',
   styles: `

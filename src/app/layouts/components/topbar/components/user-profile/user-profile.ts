@@ -110,6 +110,7 @@ export class UserProfile implements OnInit, AfterViewInit {
         '640px': '95vw',
       },
       modal: true,
+      closable: true,
       dismissableMask: true,
       closeOnEscape: true,
       draggable: false,

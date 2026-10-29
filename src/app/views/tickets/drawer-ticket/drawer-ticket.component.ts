@@ -196,6 +196,14 @@ export class DrawerTicketComponent {
     return comment.displayName ? `${comment.displayName} · ${source}` : source;
   }
 
+  isHiddenEmailAttachment(file: { name: string; mimeType: string }): boolean {
+    return file.mimeType.toLowerCase() === 'message/rfc822' || file.name.toLowerCase().endsWith('.eml');
+  }
+
+  get hasVisibleAttachments(): boolean {
+    return (this.ticket?.attachments ?? []).some(file => !this.isHiddenEmailAttachment(file));
+  }
+
   attachmentPresentation(attachment: GemClientesTicketAttachment): AttachmentPresentation {
     const mimeType = attachment.mimeType.toLowerCase();
     const type = this.attachmentType(mimeType);
