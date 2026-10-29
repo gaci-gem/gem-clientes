@@ -7,6 +7,7 @@ import { credentialsInterceptor } from './core/credentials.interceptor';
 import { invalidSessionInterceptor } from './core/invalid-session.interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
+import { MessageService } from 'primeng/api';
 import Aura from '@primeuix/themes/aura';
 import { registerLocaleData } from '@angular/common';
 import esAR from '@angular/common/locales/es-AR';
@@ -28,6 +29,7 @@ export const appConfig: ApplicationConfig = {
         }
       }
     }),
+    MessageService,
     {provide: LOCALE_ID, useValue: 'es-AR' }
   ]
 };

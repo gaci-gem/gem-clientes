@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
+import { DynamicDialogRef } from 'primeng/dynamicdialog';
+import { MessageService } from 'primeng/api';
 import { GemClientesPasswordService } from '../../core/services/gem-clientes-password.service';
+import { showErrorToast, showSuccessToast } from '../../utils/message-utils';
 
 @Component({
   selector: 'app-account',
@@ -13,6 +16,8 @@ import { GemClientesPasswordService } from '../../core/services/gem-clientes-pas
 export class AccountComponent {
   private readonly formBuilder = inject(FormBuilder);
   private readonly passwordService = inject(GemClientesPasswordService);
+  private readonly dialogRef = inject(DynamicDialogRef, { optional: true });
+  private readonly messageService = inject(MessageService);
 
   protected readonly passwordForm = this.formBuilder.nonNullable.group({
     currentPassword: ['', Validators.required],
@@ -26,42 +31,40 @@ export class AccountComponent {
     newPassword: false,
     confirmation: false,
   };
-  protected successMessage = '';
-  protected errorMessage = '';
 
   protected submit(): void {
     this.hasAttemptedSubmit = true;
     if (this.passwordForm.invalid) {
       this.passwordForm.markAllAsTouched();
-      this.errorMessage = 'Revisá los campos indicados antes de actualizar tu contraseña.';
+      showErrorToast(this.messageService, 'Error', 'Revisá los campos indicados antes de actualizar tu contraseña.');
       return;
     }
     const { currentPassword, newPassword, confirmation } = this.passwordForm.getRawValue();
     if (newPassword === currentPassword) {
-      this.errorMessage = 'La nueva contraseña debe ser distinta de la actual.';
+      showErrorToast(this.messageService, 'Error', 'La nueva contraseña debe ser distinta de la actual.');
       return;
     }
     if (newPassword !== confirmation) {
-      this.errorMessage = 'Las contraseñas nuevas no coinciden.';
+      showErrorToast(this.messageService, 'Error', 'Las contraseñas nuevas no coinciden.');
       return;
     }
     this.isSubmitting = true;
-    this.successMessage = '';
-    this.errorMessage = '';
     this.passwordService.changePassword({ currentPassword, newPassword, confirmation }).pipe(
       finalize(() => this.isSubmitting = false),
     ).subscribe({
       next: () => {
         this.passwordForm.reset();
         this.hasAttemptedSubmit = false;
-        this.successMessage = 'Tu contraseña se actualizó correctamente.';
+        showSuccessToast(this.messageService, 'Contraseña actualizada', 'Tu contraseña se actualizó correctamente.');
+        this.dialogRef?.close();
       },
       error: (error) => {
-        this.errorMessage = error.status === 401
+        const message = error.status === 401
           ? 'La contraseña actual no es válida.'
           : error.status === 400
             ? this.getBadRequestMessage(error)
             : 'No pudimos actualizar tu contraseña. Intentá nuevamente.';
+        showErrorToast(this.messageService, 'Error', message);
       },
     });
   }

@@ -32,6 +32,7 @@ describe('UserProfile', () => {
     expect(dialogService.open).toHaveBeenCalledWith(AccountComponent, jasmine.objectContaining({
       header: 'Cambiar contraseña',
       modal: true,
+      closable: true,
       width: 'min(560px, 95vw)',
       breakpoints: { '640px': '95vw' },
     }));
