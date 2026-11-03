@@ -15,6 +15,13 @@ export interface ChangelogChange {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '0.3.3',
+    date: '2026-11-03',
+    changes: [
+      { type: 'fix', text: 'Corregimos la consulta de tickets del portal y mejoramos la presentación de sus filtros.' },
+    ],
+  },
+  {
     version: '0.3.2',
     date: '2026-10-28',
     changes: [

@@ -25,19 +25,19 @@
                <p-button label="Nuevo ticket" icon="pi pi-plus" (onClick)="openCreateDialog()" />
              </ng-template>
            </p-toolbar>
-            <div class="app-filter-row d-flex align-items-end gap-3 mb-3 flex-wrap" role="search" aria-label="Filtros de tickets">
-               <div><label class="form-label mb-1" for="ticket-search">Buscar</label><span class="p-input-icon-left">
-                <i class="pi pi-search" aria-hidden="true"></i>
-                <input pInputText type="text" [value]="searchValue()"
-                 (input)="searchValue.set($any($event.target).value)" placeholder="Asunto, descripción o referencia" />
-              </span></div>
-               <div><label class="form-label mb-1" for="ticket-status">Estado</label><select id="ticket-status" class="form-select" [value]="statusFilter()" (change)="statusFilter.set($any($event.target).value)"><option value="">Todos</option><option value="INGRESADO">Ingresado</option><option value="EN_REVISION">En revisión</option><option value="EN_DESARROLLO">En desarrollo</option><option value="CERRADO">Cerrado (cierra ticket)</option><option value="RECHAZADO">Rechazado (cierra ticket)</option><option value="ESPERANDO_RESPUESTA_CLIENTE">Esperando respuesta del cliente</option></select></div>
-               <div><label class="form-label mb-1" for="ticket-priority">Prioridad</label><select id="ticket-priority" class="form-select" [value]="priorityFilter()" (change)="priorityFilter.set($any($event.target).value)"><option value="">Todas</option><option value="CRITICA">🔴 Crítica</option><option value="ALTA">🟠 Alta</option><option value="MEDIA">🟡 Media</option><option value="BAJA">🟢 Baja</option></select></div>
-               <div><label class="form-label mb-1" for="ticket-type">Tipo</label><select id="ticket-type" class="form-select" [value]="typeFilter()" (change)="typeFilter.set($any($event.target).value)"><option value="">Todos</option><option value="CONSULTA">Consultas</option><option value="ERROR_INCIDENTE">Error / Incidente</option><option value="REQUERIMIENTO_MEJORA">Requerimiento / Mejora</option></select></div>
-              <div><label class="form-label mb-1" for="ticket-created-from">Creado desde</label><input id="ticket-created-from" class="form-control" type="date" [value]="createdFrom()" (change)="createdFrom.set($any($event.target).value)" /></div>
-              <div><label class="form-label mb-1" for="ticket-created-to">Creado hasta</label><input id="ticket-created-to" class="form-control" type="date" [value]="createdTo()" (change)="createdTo.set($any($event.target).value)" /></div>
-              <p-button label="Aplicar" icon="pi pi-search" (onClick)="applyFilters()" [disabled]="loading()" ariaLabel="Aplicar filtros de tickets" />
-            </div>
+             <div class="ticket-filters" role="search" aria-label="Filtros de tickets">
+                <div class="ticket-filter ticket-filter-search"><label class="form-label" for="ticket-search">Buscar</label><span class="ticket-search-control">
+                 <i class="pi pi-search" aria-hidden="true"></i>
+                 <input id="ticket-search" pInputText type="text" [value]="searchValue()"
+                  (input)="searchValue.set($any($event.target).value)" placeholder="Asunto, descripción o referencia" />
+               </span></div>
+                <div class="ticket-filter ticket-filter-status"><label class="form-label" for="ticket-status">Estado</label><p-multiSelect inputId="ticket-status" [options]="[{label: 'Ingresado', value: 'INGRESADO'}, {label: 'En revisión', value: 'EN_REVISION'}, {label: 'En desarrollo', value: 'EN_DESARROLLO'}, {label: 'Cerrado (cierra ticket)', value: 'CERRADO'}, {label: 'Rechazado (cierra ticket)', value: 'RECHAZADO'}, {label: 'Esperando respuesta del cliente', value: 'ESPERANDO_RESPUESTA_CLIENTE'}]" [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)" optionLabel="label" optionValue="value" placeholder="Todos los estados" [showToggleAll]="true" [showClear]="true" selectedItemsLabel="{0} estados seleccionados" /></div>
+                <div class="ticket-filter ticket-filter-priority"><label class="form-label" for="ticket-priority">Prioridad</label><select id="ticket-priority" class="form-select" [value]="priorityFilter()" (change)="priorityFilter.set($any($event.target).value)"><option value="">Todas</option><option value="CRITICA">🔴 Crítica</option><option value="ALTA">🟠 Alta</option><option value="MEDIA">🟡 Media</option><option value="BAJA">🟢 Baja</option></select></div>
+                <div class="ticket-filter ticket-filter-type"><label class="form-label" for="ticket-type">Tipo</label><select id="ticket-type" class="form-select" [value]="typeFilter()" (change)="typeFilter.set($any($event.target).value)"><option value="">Todos</option><option value="CONSULTA">Consultas</option><option value="ERROR_INCIDENTE">Error / Incidente</option><option value="REQUERIMIENTO_MEJORA">Requerimiento / Mejora</option></select></div>
+                <div class="ticket-filter ticket-filter-date"><label class="form-label" for="ticket-created-from">Creado desde</label><input id="ticket-created-from" class="form-control" type="date" [value]="createdFrom()" (change)="createdFrom.set($any($event.target).value)" /></div>
+                <div class="ticket-filter ticket-filter-date"><label class="form-label" for="ticket-created-to">Creado hasta</label><input id="ticket-created-to" class="form-control" type="date" [value]="createdTo()" (change)="createdTo.set($any($event.target).value)" /></div>
+                <div class="ticket-filter-action"><p-button label="Aplicar" icon="pi pi-search" (onClick)="applyFilters()" [disabled]="loading()" ariaLabel="Aplicar filtros de tickets" /></div>
+             </div>
             @if (filterError(); as filterErrorMessage) { <p class="text-danger" role="alert">{{ filterErrorMessage }}</p> }
            <p-table
             #dt

@@ -13,7 +13,7 @@ import {
 
 export interface GemClientesTicketFilters {
   search?: string;
-  estado?: string;
+  estado?: string | string[];
   createdFrom?: string;
   createdTo?: string;
   page?: number;
@@ -28,7 +28,7 @@ export class GemClientesTicketsService {
 
   listTickets(filters: GemClientesTicketFilters = {}): Observable<GemClientesTicketPage> {
     let params = new HttpParams();
-    for (const [key, value] of Object.entries(filters)) if (value) params = params.set(key, value);
+    for (const [key, value] of Object.entries(filters)) if (value && (!Array.isArray(value) || value.length)) params = params.set(key, Array.isArray(value) ? value.join(',') : value);
     return this.http.get<GemClientesTicketPage>(
       `${environment.apiBaseUrl}/v1/gem-clientes/tickets`,
       { params },
