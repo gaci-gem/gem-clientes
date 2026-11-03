@@ -16,6 +16,7 @@ import { GemClientesTicketFilters, GemClientesTicketsService } from '../../core/
 import { DrawerTicketComponent } from './drawer-ticket/drawer-ticket.component';
 import { SseService } from '../../core/services/sse.service';
 import { GemClientesIdentityService } from '../../core/services/gem-clientes-identity.service';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 @Component({
   selector: 'app-tickets',
@@ -28,6 +29,7 @@ import { GemClientesIdentityService } from '../../core/services/gem-clientes-ide
     FormsModule,
     InputTextModule,
     LoadingSpinnerComponent,
+    MultiSelectModule,
     TableModule,
     TagModule,
     ToolbarModule,
@@ -63,7 +65,7 @@ export class TicketsComponent implements OnInit {
   readonly newExternalReference = signal('');
   readonly newFiles = signal<File[]>([]);
   searchValue = signal('');
-  statusFilter = signal('');
+  statusFilter = signal<string[]>([]);
   priorityFilter = signal('');
   typeFilter = signal('');
   newType = signal('');
@@ -124,7 +126,7 @@ export class TicketsComponent implements OnInit {
   filters(): GemClientesTicketFilters {
     return {
       ...(this.searchValue().trim() ? { search: this.searchValue().trim() } : {}),
-      ...(this.statusFilter() ? { estado: this.statusFilter() } : {}),
+      ...(this.statusFilter().length ? { estado: this.statusFilter() } : {}),
       ...(this.priorityFilter() ? { prioridad: this.priorityFilter() } : {}),
       ...(this.typeFilter() ? { tipo: this.typeFilter() } : {}),
       ...(this.createdFrom() ? { createdFrom: this.createdFrom() } : {}),
@@ -298,7 +300,7 @@ export class TicketsComponent implements OnInit {
   clear(table?: Table) {
     table?.clear();
     this.searchValue.set('');
-    this.statusFilter.set('');
+    this.statusFilter.set([]);
     this.priorityFilter.set(''); this.typeFilter.set('');
     this.createdFrom.set('');
     this.createdTo.set('');

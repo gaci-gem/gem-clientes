@@ -220,13 +220,13 @@ describe('TicketsComponent', () => {
     fixture.detectChanges();
 
     fixture.componentInstance.searchValue.set(' access ');
-    fixture.componentInstance.statusFilter.set('EN_REVISION');
+    fixture.componentInstance.statusFilter.set(['EN_REVISION']);
     fixture.componentInstance.createdFrom.set('2026-09-01');
     fixture.componentInstance.createdTo.set('2026-09-30');
     fixture.componentInstance.page = 3;
     (fixture.componentInstance as any).table = { first: 20 };
     fixture.componentInstance.applyFilters();
-    expect(service.listTickets).toHaveBeenCalledWith({ search: 'access', estado: 'EN_REVISION', createdFrom: '2026-09-01', createdTo: '2026-09-30', page: 1, limit: 10 });
+    expect(service.listTickets).toHaveBeenCalledWith({ search: 'access', estado: ['EN_REVISION'], createdFrom: '2026-09-01', createdTo: '2026-09-30', page: 1, limit: 10 });
     expect((fixture.componentInstance as any).table.first).toBe(0);
 
     (fixture.componentInstance as any).table.first = 20;
